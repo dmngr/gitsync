@@ -1,0 +1,30 @@
+{
+  "name": "@deliverymanager/gitsync",
+  "version": "1.0.0",
+  "description": "Synchronize multiple git repos recursively",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "ioanniswd",
+  "license": "ISC",
+  "preferGlobal": true,
+  "bin": {
+    "gitsync": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ioanniswd/gitsync.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ioanniswd/gitsync/issues"
+  },
+  "homepage": "https://github.com/ioanniswd/gitsync#readme",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "colors": "^1.1.2",
+    "find": "^0.2.7",
+    "nodegit": "^0.20.3"
+  }
+}
