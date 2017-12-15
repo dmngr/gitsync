@@ -2,84 +2,43 @@
 
 const fs = Promise.promisifyAll(require('fs'));
 const home = require('os').homedir();
-const prompt = require('prompt');
+const prompt = require('prompt-promise');
 
 module.exports = function(done) {
 
   var cred;
 
-  function initCred(done) {
-    var schema = {
-      properties: {
-        username: {
-          description: 'Github username',
-          type: 'string',
-          required: true
-        },
-        at: {
-          description: 'Github API access token',
-          type: 'string',
-          required: false
-        }
-      }
-    };
-
-    prompt.start();
-
-    prompt.get(schema, function(err, result) {
-      if (err) {
-        done(err);
-
-      } else {
-        cred = {
-          user: result.username,
-          at: result.at
-        };
+  function init() {
+    return prompt('Github username')
+      .then(username => {
+        cred.user = username;
+        return prompt('Github API access token');
+      })
+      .then(at => {
+        cred.at = at;
         let data = JSON.stringify(cred, null, '\t');
-        fs.writeFile(`${home}/.wsinit.json`, data, done);
-      }
-    });
+        return fs.writeFileAsync(`${home}/.wsinit.json`, data);
+      });
   }
 
-  fs.readFile(`${home}/.wsinit.json`, 'utf-8', function(err, data) {
-    if (err && err.code != 'ENOENT') throw err;
-    else {
-      if (err && err.code == 'ENOENT') {
+  // check if exists first
+  fs.readFileAsync(`${home}/.wsinit.json`, 'utf-8')
+    .then(data => {
+      data = JSON.parse(data);
+      console.log('Credentials file already exists:');
+      console.log(data);
+
+      return prompt.confirm('Update credentials file? (yes)');
+    })
+    .then(update => {
+      console.log('update:', update);
+      return update ? init : Promise.resolve('Credentials not updated');
+    })
+    .catch(err => {
+      if (err.code != 'ENOENT') throw err;
+      else {
         console.log('Creating Credentials File..');
-        initCred(function(err) {
-          if (err) done(err);
-          else done(null, 'Credentials initialized', cred);
-        });
-
-      } else {
-        data = JSON.parse(data);
-        console.log('Credentials file already exists:');
-        console.log(data);
-
-        let schema = {
-          properties: {
-            ok: {
-              description: 'Update credentials file?[y/n]',
-              required: true
-            }
-          }
-        };
-
-        prompt.start();
-
-        prompt.get(schema, function(err, result) {
-          if (err) done(err);
-          else {
-            if (result.ok.toLowerCase()[0] != 'n') {
-              initCred(function(err) {
-                if (err) done(err);
-                else done(null, 'Credentials updated');
-              });
-
-            } else done(null, 'Credentials not updated');
-          }
-        });
+        return init;
       }
-    }
-  });
+    });
 };
