@@ -4,6 +4,19 @@ var Promise = require('bluebird');
 
 const request = Promise.promisify(require('request'), {multiArgs: true});
 
+
+/**
+ *
+ * @module
+ */
+/**
+ *
+ * @param  {string} name Github username
+ * @param  {boolean} org  Whether the account belongs to an organization
+ * @param  {string} user User-Agent Header
+ * @param  {string} at   Github authentication token
+ * @return {repos}      Mapped to have attributes name, full_name, local_path
+ */
 module.exports = function(name, org, user, at) {
 
   var url = "https://api.github.com/";
