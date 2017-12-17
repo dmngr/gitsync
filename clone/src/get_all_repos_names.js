@@ -12,11 +12,11 @@ const request = Promise.promisify(require('request'), {
  */
 /**
  *
- * @param  {type} name description
- * @param  {type} org  description
- * @param  {type} user description
- * @param  {type} at   description
- * @return {type}      description
+ * @param  {string} name Github username
+ * @param  {boolean} org  Whether the account belongs to an organization
+ * @param  {string} user User-Agent Header
+ * @param  {string} at   Github authentication token
+ * @return {repos}      Mapped to have attributes name, full_name, local_path
  */
 module.exports = function(name, org, user, at) {
 
