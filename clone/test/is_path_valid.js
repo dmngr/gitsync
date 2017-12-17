@@ -1,9 +1,7 @@
 "use strict";
 
 const expect = require('chai').expect;
-const is_path_valid = require('../../src/clone/index').is_path_valid;
-
-console.log('is_path_valid:', is_path_valid);
+const is_path_valid = require('../src/index').is_path_valid;
 
 describe('Is Path Valid Module', function() {
 

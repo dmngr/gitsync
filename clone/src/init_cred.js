@@ -1,5 +1,7 @@
 "use strict";
 
+var Promise = require('bluebird');
+
 const fs = Promise.promisifyAll(require('fs'));
 const home = require('os').homedir();
 const prompt = require('prompt-promise');
