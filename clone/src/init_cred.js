@@ -6,7 +6,17 @@ const fs = Promise.promisifyAll(require('fs'));
 const home = require('os').homedir();
 const prompt = require('prompt-promise');
 
-module.exports = function(done) {
+/**
+ * Initializes/updates git credentials
+ * @module
+ */
+/**
+ *
+ * Reads file with credentials, prompts for creation if not found and for update if found.
+ * Creates/Updates credentials.
+ * @return {Promise} Resolves to the the output of fs.writeFile or to message: 'Credentials not updated'
+ */
+module.exports = function() {
 
   var cred;
 
@@ -19,12 +29,12 @@ module.exports = function(done) {
       .then(at => {
         cred.at = at;
         let data = JSON.stringify(cred, null, '\t');
-        return fs.writeFileAsync(`${home}/.wsinit.json`, data);
+        return fs.writeFileAsync(`${home}/.gitsync.json`, data);
       });
   }
 
   // check if exists first
-  fs.readFileAsync(`${home}/.wsinit.json`, 'utf-8')
+  return fs.readFileAsync(`${home}/.gitsync.json`, 'utf-8')
     .then(data => {
       data = JSON.parse(data);
       console.log('Credentials file already exists:');

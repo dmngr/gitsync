@@ -2,14 +2,18 @@
 
 var Promise = require('bluebird');
 
-const exec = Promise.promisify(require('child_process').exec, {multiArgs: true});
+const exec = Promise.promisify(require('child_process').exec, {
+  multiArgs: true
+});
 const home = require('os').homedir();
 
 const is_path_valid = require('./is_path_valid');
 
-
 /**
  * Clones a repo in path specified if path is valid. Else, clones to cwd
+ * @module
+ */
+/**
  *
  * @param  {object} repo Repository info
  * @param  {string} repo.name

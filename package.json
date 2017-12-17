@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter spec --recursive",
-    "doc": "jsdoc2md ./* >> README.md"
+    "doc": "jsdoc2md -t jsdoc2md/README.hbs clone/src/* > README.md"
   },
   "keywords": [],
   "author": "ioanniswd",

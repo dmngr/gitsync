@@ -2,8 +2,22 @@
 
 var Promise = require('bluebird');
 
-const request = Promise.promisify(require('request'), {multiArgs: true});
+const request = Promise.promisify(require('request'), {
+  multiArgs: true
+});
 
+/**
+ * Gets all user's or org's repos names
+ * @module
+ */
+/**
+ *
+ * @param  {type} name description
+ * @param  {type} org  description
+ * @param  {type} user description
+ * @param  {type} at   description
+ * @return {type}      description
+ */
 module.exports = function(name, org, user, at) {
 
   var url = "https://api.github.com/";

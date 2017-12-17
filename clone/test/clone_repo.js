@@ -25,7 +25,7 @@ describe('Clone Repo Module', function() {
 
   before(function(done) {
     this.timeout(15000);
-    fs.readFileAsync(`${home}/.wsinit.json`, 'utf-8')
+    fs.readFileAsync(`${home}/.gitsync.json`, 'utf-8')
       .then(data => {
         data = JSON.parse(data);
         repo_1 = data.test_repo_1;

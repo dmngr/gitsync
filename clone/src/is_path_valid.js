@@ -7,7 +7,7 @@
  */
 /**
  *
- * @param  {string} path
+ * @param  {string} path Path under which to clone a repo
  * @return {boolean} Whether path is valid
  */
 module.exports = function(path) {
