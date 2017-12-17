@@ -8,7 +8,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 // console.log('__dirname:', __dirname);
-const cloneRepo = require('../src/clone_repo');
+const cloneRepo = require('../src/index').clone_repo;
 const fs = Promise.promisifyAll(require('fs'));
 const home = require('os').homedir();
 const exec = Promise.promisify(require('child_process').exec, {
@@ -57,7 +57,8 @@ describe('Clone Repo Module', function() {
         // console.log('stdout:', stdout);
         // console.log('stderr:', stderr);
         // console.log('dirname:', __dirname);
-        return exec(`rm -R ${__dirname}/path`);
+        // console.log('process.cwd():', process.cwd());
+        return exec(`rm -R ${process.cwd()}/test/path`);
       })
       .spread((stdout, stderr) => {
         // console.log('stdout:', stdout);
