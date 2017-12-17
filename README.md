@@ -92,16 +92,16 @@ Gets all user's or org's repos names
 
 <a name="exp_module_clone/src/get_all_repos_names--module.exports"></a>
 
-### module.exports(name, org, user, at) ⇒ <code>type</code> ⏏
+### module.exports(name, org, user, at) ⇒ <code>repos</code> ⏏
 **Kind**: Exported function  
-**Returns**: <code>type</code> - description  
+**Returns**: <code>repos</code> - Mapped to have attributes name, full_name, local_path  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>type</code> | description |
-| org | <code>type</code> | description |
-| user | <code>type</code> | description |
-| at | <code>type</code> | description |
+| name | <code>string</code> | Github username |
+| org | <code>boolean</code> | Whether the account belongs to an organization |
+| user | <code>string</code> | User-Agent Header |
+| at | <code>string</code> | Github authentication token |
 
 
 ### is_path_valid
@@ -147,3 +147,26 @@ Finds all repository folder paths under cwd. Used to update repos status
 ### module.exports() ⇒ <code>Array.&lt;string&gt;</code> ⏏
 **Kind**: Exported function  
 **Returns**: <code>Array.&lt;string&gt;</code> - The repository folder paths under cwd  
+
+### get_status
+Updates refs for cwd
+
+<a name="exp_module_pull/src/get_status--module.exports"></a>
+
+### module.exports() ⇒ <code>string</code> ⏏
+**Kind**: Exported function  
+**Returns**: <code>string</code> - Repo status: diverged, fast-forward, up-to-date  
+
+### pull_all
+Pulls all branches for repo
+
+<a name="exp_module_pull/src/pull_all--module.exports"></a>
+
+### module.exports(dir) ⇒ <code>string</code> ⏏
+**Kind**: Exported function  
+**Returns**: <code>string</code> - Success message  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dir | <code>string</code> | Path to repo |
+

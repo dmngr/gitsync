@@ -16,6 +16,6 @@ describe('TOP', function() {
   describe('Pull module', function() {
     import_test('Get Existing Repos', '../pull/test/get_existing_repos');
     import_test('Get Status', '../pull/test/get_status');
-
+    import_test('Pull All', '../pull/test/pull_all');
   });
 });
