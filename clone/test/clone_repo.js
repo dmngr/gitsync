@@ -18,7 +18,6 @@ const exec = Promise.promisify(require('child_process').exec, {
 // NOTE: You may need to increase the timeout, depending on your internet
 // connection speed.
 
-describe('Clone Repo Module', function() {
   var repo_1;
   var repo_2;
   var at;
@@ -70,5 +69,3 @@ describe('Clone Repo Module', function() {
         throw err;
       });
   });
-
-});

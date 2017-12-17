@@ -70,14 +70,15 @@ Empty repository description -> Will clone the repository in `./<repository name
 ##### If you try to use the script without the `.gitsync.json` file present in the home folder, you will be prompted to initialize it, and execution will continue after the file is created.
 ##### *Note*: You could omit the access token. The script will still work but *only* for public repositories.
 
-* * *
-
 # API Reference
+---
 
-## init_cred
+## Clone
+
+### init_cred
 Initializes/updates git credentials
 
-<a name="exp_module_init_cred--module.exports"></a>
+<a name="exp_module_clone/src/init_cred--module.exports"></a>
 
 ### module.exports() ⇒ <code>Promise</code> ⏏
 Reads file with credentials, prompts for creation if not found and for update if found.
@@ -86,10 +87,10 @@ Creates/Updates credentials.
 **Kind**: Exported function  
 **Returns**: <code>Promise</code> - Resolves to the the output of fs.writeFile or to message: 'Credentials not updated'  
 
-## get_all_repos_names
+### get_all_repos_names
 Gets all user's or org's repos names
 
-<a name="exp_module_get_all_repos_names--module.exports"></a>
+<a name="exp_module_clone/src/get_all_repos_names--module.exports"></a>
 
 ### module.exports(name, org, user, at) ⇒ <code>type</code> ⏏
 **Kind**: Exported function  
@@ -103,10 +104,10 @@ Gets all user's or org's repos names
 | at | <code>type</code> | description |
 
 
-## is_path_valid
+### is_path_valid
 Checks for validity of path, must be string and satisfy
 
-<a name="exp_module_is_path_valid--module.exports"></a>
+<a name="exp_module_clone/src/is_path_valid--module.exports"></a>
 
 ### module.exports(path) ⇒ <code>boolean</code> ⏏
 **Kind**: Exported function  
@@ -117,10 +118,10 @@ Checks for validity of path, must be string and satisfy
 | path | <code>string</code> | Path under which to clone a repo |
 
 
-## clone_repo
+### clone_repo
 Clones a repo in path specified if path is valid. Else, clones to cwd
 
-<a name="exp_module_clone_repo--module.exports"></a>
+<a name="exp_module_clone/src/clone_repo--module.exports"></a>
 
 ### module.exports(repo, at) ⇒ <code>Promise</code> ⏏
 **Kind**: Exported function  
@@ -133,3 +134,16 @@ Clones a repo in path specified if path is valid. Else, clones to cwd
 | repo.full_name | <code>string</code> |  |
 | repo.local_path | <code>string</code> | local path to which the repo will be cloned |
 | at | <code>string</code> | Github authentication token |
+
+---
+
+## Pull
+
+### get_existing_repos
+Finds all repository folder paths under cwd. Used to update repos status
+
+<a name="exp_module_pull/src/get_existing_repos--module.exports"></a>
+
+### module.exports() ⇒ <code>Array.&lt;string&gt;</code> ⏏
+**Kind**: Exported function  
+**Returns**: <code>Array.&lt;string&gt;</code> - The repository folder paths under cwd  

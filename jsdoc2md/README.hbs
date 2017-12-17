@@ -70,36 +70,48 @@ Empty repository description -> Will clone the repository in `./<repository name
 ##### If you try to use the script without the `.gitsync.json` file present in the home folder, you will be prompted to initialize it, and execution will continue after the file is created.
 ##### *Note*: You could omit the access token. The script will still work but *only* for public repositories.
 
-* * *
-
 # API Reference
+---
 
-## init_cred
-{{#module name="init_cred"}}
+## Clone
+
+### init_cred
+{{#module name="clone/src/init_cred"}}
 {{>body~}}
 {{>member-index~}}
 {{>separator~}}
 {{>members~}}
 {{/module}}
 
-## get_all_repos_names
-{{#module name="get_all_repos_names"}}
+### get_all_repos_names
+{{#module name="clone/src/get_all_repos_names"}}
 {{>body~}}
 {{>member-index~}}
 {{>separator~}}
 {{>members~}}
 {{/module}}
 
-## is_path_valid
-{{#module name="is_path_valid"}}
+### is_path_valid
+{{#module name="clone/src/is_path_valid"}}
 {{>body~}}
 {{>member-index~}}
 {{>separator~}}
 {{>members~}}
 {{/module}}
 
-## clone_repo
-{{#module name="clone_repo"}}
+### clone_repo
+{{#module name="clone/src/clone_repo"}}
+{{>body~}}
+{{>member-index~}}
+{{>separator~}}
+{{>members~}}
+{{/module}}
+---
+
+## Pull
+
+### get_existing_repos
+{{#module name="pull/src/get_existing_repos"}}
 {{>body~}}
 {{>member-index~}}
 {{>separator~}}
