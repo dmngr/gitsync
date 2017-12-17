@@ -17,5 +17,7 @@ describe('TOP', function() {
     import_test('Get Existing Repos', '../src/pull/test/get_existing_repos');
     import_test('Get Status', '../src/pull/test/get_status');
     import_test('Pull All', '../src/pull/test/pull_all');
+    import_test('Get All Branches', '../src/pull/test/get_all_branches');
+    import_test('Track Missing Branches', '../src/pull/test/track_missing_branches');
   });
 });

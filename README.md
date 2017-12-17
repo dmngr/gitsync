@@ -170,3 +170,26 @@ Pulls all branches for repo
 | --- | --- | --- |
 | dir | <code>string</code> | Path to repo |
 
+
+### get_all_branches
+Returns all repo branches
+
+<a name="exp_module_src/pull/lib/get_all_branches--module.exports"></a>
+
+### module.exports() ⇒ <code>Array.&lt;string&gt;</code> ⏏
+**Kind**: Exported function  
+**Returns**: <code>Array.&lt;string&gt;</code> - The branch names  
+
+### track_missing_branches
+Creates local branches production and branches with prodv prefix, if not found
+
+<a name="exp_module_src/pull/lib/track_missing_branches--module.exports"></a>
+
+### module.exports(branches) ⇒ <code>Array.&lt;string&gt;</code> ⏏
+**Kind**: Exported function  
+**Returns**: <code>Array.&lt;string&gt;</code> - The branches that were added  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| branches | <code>Array.&lt;string&gt;</code> | All repo branches |
+
