@@ -8,7 +8,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 // console.log('__dirname:', __dirname);
-const cloneRepo = require('../src/index').clone_repo;
+const cloneRepo = require('../index').clone_repo;
 const fs = Promise.promisifyAll(require('fs'));
 const home = require('os').homedir();
 const exec = Promise.promisify(require('child_process').exec, {

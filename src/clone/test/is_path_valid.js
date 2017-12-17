@@ -1,7 +1,7 @@
 "use strict";
 
 const expect = require('chai').expect;
-const is_path_valid = require('../src/index').is_path_valid;
+const is_path_valid = require('../index').is_path_valid;
 
 it('returns true for correct path without subfolders', function() {
   var path = 'path';

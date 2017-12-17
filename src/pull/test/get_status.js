@@ -7,7 +7,7 @@
 // chai.use(chaiAsPromised);
 // const expect = chai.expect;
 //
-// const get_status = require('../src/index').get_status;
+// const get_status = require('../index').get_status;
 //
 // it('for up to date repo', function() {
 //   return expect(get_status()).to.eventually.equal('up-to-date');

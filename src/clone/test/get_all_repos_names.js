@@ -7,7 +7,7 @@ const expect = chai.expect;
 
 const _ = require('lodash');
 
-const get_all_repos_names = require('../src/index').get_all_repos_names;
+const get_all_repos_names = require('../index').get_all_repos_names;
 const fs = require('fs');
 const home = require('os').homedir();
 

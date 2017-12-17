@@ -78,7 +78,7 @@ Empty repository description -> Will clone the repository in `./<repository name
 ### init_cred
 Initializes/updates git credentials
 
-<a name="exp_module_clone/src/init_cred--module.exports"></a>
+<a name="exp_module_src/clone/lib/init_cred--module.exports"></a>
 
 ### module.exports() ⇒ <code>Promise</code> ⏏
 Reads file with credentials, prompts for creation if not found and for update if found.
@@ -90,7 +90,7 @@ Creates/Updates credentials.
 ### get_all_repos_names
 Gets all user's or org's repos names
 
-<a name="exp_module_clone/src/get_all_repos_names--module.exports"></a>
+<a name="exp_module_src/clone/lib/get_all_repos_names--module.exports"></a>
 
 ### module.exports(name, org, user, at) ⇒ <code>repos</code> ⏏
 **Kind**: Exported function  
@@ -107,7 +107,7 @@ Gets all user's or org's repos names
 ### is_path_valid
 Checks for validity of path, must be string and satisfy
 
-<a name="exp_module_clone/src/is_path_valid--module.exports"></a>
+<a name="exp_module_src/clone/lib/is_path_valid--module.exports"></a>
 
 ### module.exports(path) ⇒ <code>boolean</code> ⏏
 **Kind**: Exported function  
@@ -121,7 +121,7 @@ Checks for validity of path, must be string and satisfy
 ### clone_repo
 Clones a repo in path specified if path is valid. Else, clones to cwd
 
-<a name="exp_module_clone/src/clone_repo--module.exports"></a>
+<a name="exp_module_src/clone/lib/clone_repo--module.exports"></a>
 
 ### module.exports(repo, at) ⇒ <code>Promise</code> ⏏
 **Kind**: Exported function  
@@ -142,7 +142,7 @@ Clones a repo in path specified if path is valid. Else, clones to cwd
 ### get_existing_repos
 Finds all repository folder paths under cwd. Used to update repos status
 
-<a name="exp_module_pull/src/get_existing_repos--module.exports"></a>
+<a name="exp_module_src/pull/lib/get_existing_repos--module.exports"></a>
 
 ### module.exports() ⇒ <code>Array.&lt;string&gt;</code> ⏏
 **Kind**: Exported function  
@@ -151,7 +151,7 @@ Finds all repository folder paths under cwd. Used to update repos status
 ### get_status
 Updates refs for cwd
 
-<a name="exp_module_pull/src/get_status--module.exports"></a>
+<a name="exp_module_src/pull/lib/get_status--module.exports"></a>
 
 ### module.exports() ⇒ <code>string</code> ⏏
 **Kind**: Exported function  
@@ -160,7 +160,7 @@ Updates refs for cwd
 ### pull_all
 Pulls all branches for repo
 
-<a name="exp_module_pull/src/pull_all--module.exports"></a>
+<a name="exp_module_src/pull/lib/pull_all--module.exports"></a>
 
 ### module.exports(dir) ⇒ <code>string</code> ⏏
 **Kind**: Exported function  
