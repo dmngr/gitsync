@@ -6,6 +6,9 @@ const request = Promise.promisify(require('request'), {
   multiArgs: true
 });
 
+const is_path_valid = require('./is_path_valid');
+
+
 /**
  * Gets all user's or org's repos names
  * @module
@@ -40,6 +43,19 @@ module.exports = function(name, org, user, at) {
     .spread((res, body) => {
       // console.log(body);
       // console.log('res:', res);
+      // console.log('headers: ', res.headers);
+      // console.log('link:', res.headers.link);
+      // console.log('typeof link:', typeof res.headers.link);
+
+      var next_link;
+
+      res.headers.link.split(',').forEach(str => {
+        var arr = str.trim().split(';');
+        if (arr[1].indexOf('next') !== -1) next_link = arr[0].slice(1, -1);
+      });
+
+      console.log('next_link:', next_link);
+
       body = JSON.parse(body);
       // console.log(body[0]);
       // console.log('body[0]:', Object.keys(body[0]));
@@ -47,12 +63,15 @@ module.exports = function(name, org, user, at) {
       let repos = [];
 
       body.forEach(function(repo) {
-        repos.push({
-          name: repo.name,
-          full_name: repo.full_name,
-          local_path: repo.description,
-        });
+        if (is_path_valid(repo.description)) {
+          repos.push({
+            name: repo.name,
+            full_name: repo.full_name,
+            local_path: repo.description,
+          });
+        }
       });
+
       console.log('repos: ', repos.length);
       return Promise.resolve(repos);
     })

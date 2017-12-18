@@ -29,13 +29,13 @@ module.exports = function() {
 
       // remove local repos from remote repos
       remote_repos = remote_repos.filter(remote_repo => local_repos.findIndex(local_repo => {
-        console.log('local_repo:', local_repo);
-        console.log('remote_repo: ', remote_repo);
+        // console.log('local_repo:', local_repo);
+        // console.log('remote_repo: ', remote_repo);
         return local_repo.indexOf(remote_repo.name) === -1;
       }) === -1);
 
-      console.log('remote_repos:', remote_repos);
-      console.log('local_repos:', local_repos);
+      // console.log('remote_repos:', remote_repos);
+      // console.log('local_repos:', local_repos);
 
       console.log('cloning repos');
       return Promise.map(remote_repos, clone.clone_repo)

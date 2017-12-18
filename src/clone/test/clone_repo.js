@@ -8,7 +8,8 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 // console.log('__dirname:', __dirname);
-const cloneRepo = require('../index').clone_repo;
+const index = require('../index');
+const clone_repo = new index().clone_repo;
 const fs = Promise.promisifyAll(require('fs'));
 const home = require('os').homedir();
 const exec = Promise.promisify(require('child_process').exec, {
@@ -40,13 +41,13 @@ const exec = Promise.promisify(require('child_process').exec, {
   it('correct path', function() {
     this.timeout(15000);
     // console.log('repo_1:', repo_1);
-    return expect(cloneRepo(repo_1, at)).to.eventually.equal(`test/path/${repo_1.name}`);
+    return expect(clone_repo(repo_1, at)).to.eventually.equal(`test/path/${repo_1.name}`);
   });
 
   it('wrong path', function() {
     this.timeout(15000);
     // console.log('repo_2:', repo_2);
-    return expect(cloneRepo(repo_2, at)).to.eventually.equal("");
+    return expect(clone_repo(repo_2, at)).to.eventually.equal("");
   });
 
   after(function(done) {

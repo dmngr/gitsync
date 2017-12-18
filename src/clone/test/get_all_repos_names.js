@@ -7,7 +7,8 @@ const expect = chai.expect;
 
 const _ = require('lodash');
 
-const get_all_repos_names = require('../index').get_all_repos_names;
+const index = require('../index');
+const get_all_repos_names = new index().get_all_repos_names;
 const fs = require('fs');
 const home = require('os').homedir();
 
@@ -41,7 +42,7 @@ describe('for user', function() {
   it('returns correct array', function(done) {
     get_all_repos_names(name, org, user, at)
     .then(arr => {
-      expect(arr).to.be.an('array').and.have.lengthOf.above(10);
+      expect(arr).to.be.an('array').and.have.lengthOf(1);
       _.each(arr, item => expect(item).to.have.all.keys(['name', 'full_name', 'local_path']));
       done();
     })
