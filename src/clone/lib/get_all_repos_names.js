@@ -53,7 +53,7 @@ module.exports = function(name, org, user, at) {
           local_path: repo.description,
         });
       });
-      // console.log('repos: ', repos);
+      console.log('repos: ', repos.length);
       return Promise.resolve(repos);
     })
     .catch(err => {

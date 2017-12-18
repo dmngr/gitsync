@@ -33,7 +33,7 @@ module.exports = function() {
   }
 
   this.init_cred = init_cred;
-  this.clone_repo = repo => check_at.then(() => clone_repo(repo, at)).catch(err => {
+  this.clone_repo = repo => check_at().then(() => clone_repo(repo, at)).catch(err => {
     console.log(err);
     process.exit(1);
   });

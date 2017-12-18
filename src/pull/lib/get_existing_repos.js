@@ -13,7 +13,7 @@ const homedir = require('os').homedir();
  */
 module.exports = function() {
   return new Promise(function(resolve, reject) {
-    find.file(/^((?!(node_modules|\.git|\.idea|\.vscode|\.dropbox|\.zip)).)*index\.js$/, './', dirs => {
+    find.file(/^((?!(node_modules|\.git|\.idea|\.vscode|\.dropbox|\.zip|gitsync)).)*index\.js$/, './', dirs => {
       // console.log('dirs:', dirs);
       // console.log(dirs[0].substring(0, dirs[0].indexOf('/index.js')));
       dirs = dirs.map(dir => dir.substring(0, dir.indexOf('/index.js')));
