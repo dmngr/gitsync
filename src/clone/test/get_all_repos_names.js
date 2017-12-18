@@ -24,7 +24,7 @@ describe('for user', function() {
 
   before(function(done) {
     this.timeout(15000);
-    fs.readFile(`${home}/.wsinit.json`, 'utf-8', function(err, data) {
+    fs.readFile(`${home}/.gitsync.json`, 'utf-8', function(err, data) {
       if(err) {
         console.log(err);
         done(err);

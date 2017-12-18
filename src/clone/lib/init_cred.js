@@ -18,13 +18,13 @@ const prompt = require('prompt-promise');
  */
 module.exports = function() {
 
-  var cred;
+  var cred = {};
 
   function init() {
-    return prompt('Github username')
+    return prompt('Github username: ')
       .then(username => {
         cred.user = username;
-        return prompt('Github API access token');
+        return prompt('Github API access token: ');
       })
       .then(at => {
         cred.at = at;
@@ -50,7 +50,7 @@ module.exports = function() {
       if (err.code != 'ENOENT') throw err;
       else {
         console.log('Creating Credentials File..');
-        return init;
+        return init();
       }
     });
 };
