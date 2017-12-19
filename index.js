@@ -8,6 +8,7 @@ const exec = Promise.promisify(require('child_process').exec);
 const find = Promise.promisifyAll(require('find'));
 const homedir = require('os').homedir();
 const colors = require('colors/safe');
+const path = require('path');
 
 const Clone = require('./src/clone');
 const clone = new Clone();
@@ -18,10 +19,13 @@ const pull = require('./src/pull');
 
 module.exports = function() {
 
+  process.env.UV_THREADPOOL_SIZE = 20;
+
   var start = process.hrtime();
 
   var invalid_desc_repos = [];
   var repos_to_clone = [];
+  var err_repos = [];
   // get all local and remote repos
 
   return Promise.all([
@@ -42,9 +46,9 @@ module.exports = function() {
 
       remote_repos.forEach(repo => {
         console.log('repo.local_path:', repo.local_path);
-        if(!repo.local_path || repo.local_path.indexOf('ignore:') === -1) {
+        if (!repo.local_path || repo.local_path.indexOf('ignore:') === -1) {
           console.log('not ignore');
-          if(clone.is_path_valid(repo.local_path)) repos_to_clone.push(repo);
+          if (clone.is_path_valid(repo.local_path)) repos_to_clone.push(repo);
           else invalid_desc_repos.push(repo);
         }
       });
@@ -67,16 +71,39 @@ module.exports = function() {
       var root_dir = process.cwd();
       console.log('root_dir:', root_dir);
 
-      return Promise.mapSeries(local_repos, path => {
-        process.chdir(path);
-        console.log('process.cwd():', process.cwd());
-        return pull.get_status()
+      return Promise.map(local_repos, repo_path => {
+        // console.log('repo_path:', repo_path);
+        var full_path = path.resolve(repo_path);
+
+        return pull.get_status(full_path)
           .then(status => {
-            console.log('status:', status);
-            process.chdir(root_dir);
-            // console.log('process.cwd():', process.cwd());
-            return;
+            switch (status) {
+              case 'fast-forward':
+                return pull.pull_all(full_path)
+                  .catch(err => {
+                    console.log(colors.red(`Repo ${full_path} could not pull\n`));
+                    err_repos.push(repo_path);
+                    return;
+                  });
+              case 'diverged':
+                console.log(colors.red(`Repo ${full_path} has diverged\n`));
+                return;
+              case 'ahead':
+                console.log(colors.rainbow(`Repo ${full_path} is ahead of remote\n`));
+                return;
+              case 'no-remote':
+                console.log(colors.yellow(`Repo ${full_path} has no remote\n`));
+                return;
+              case 'unsaved-changes':
+                console.log(colors.red(`Repo ${full_path} has unsaved-changes\n`));
+                return;
+              default:
+                console.log(colors.green(`Repo ${full_path} is up-to-date\n`));
+                return;
+            }
           });
+      }, {
+        concurrency: 20
       });
     })
     .then(() => {

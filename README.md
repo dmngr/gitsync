@@ -153,22 +153,27 @@ Updates refs for cwd
 
 <a name="exp_module_src/pull/lib/get_status--module.exports"></a>
 
-### module.exports() ⇒ <code>string</code> ⏏
+### module.exports(path) ⇒ <code>string</code> ⏏
 **Kind**: Exported function  
 **Returns**: <code>string</code> - Repo status: diverged, fast-forward, up-to-date  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| path | <code>string</code> | The absolute path to use as an cwd with exec |
+
 
 ### pull_all
 Pulls all branches for repo
 
 <a name="exp_module_src/pull/lib/pull_all--module.exports"></a>
 
-### module.exports(dir) ⇒ <code>string</code> ⏏
+### module.exports(path) ⇒ <code>string</code> ⏏
 **Kind**: Exported function  
 **Returns**: <code>string</code> - Success message  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| dir | <code>string</code> | Path to repo |
+| path | <code>string</code> | The absolute path to use as an cwd with exec |
 
 
 ### get_all_branches
@@ -176,20 +181,26 @@ Returns all repo branches
 
 <a name="exp_module_src/pull/lib/get_all_branches--module.exports"></a>
 
-### module.exports() ⇒ <code>Array.&lt;string&gt;</code> ⏏
+### module.exports(path) ⇒ <code>Array.&lt;string&gt;</code> ⏏
 **Kind**: Exported function  
 **Returns**: <code>Array.&lt;string&gt;</code> - The branch names  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| path | <code>string</code> | The absolute path to use as an cwd with exec |
+
 
 ### track_missing_branches
 Creates local branches production and branches with prodv prefix, if not found
 
 <a name="exp_module_src/pull/lib/track_missing_branches--module.exports"></a>
 
-### module.exports(branches) ⇒ <code>Array.&lt;string&gt;</code> ⏏
+### module.exports(path, branches) ⇒ <code>Array.&lt;string&gt;</code> ⏏
 **Kind**: Exported function  
 **Returns**: <code>Array.&lt;string&gt;</code> - The branches that were added  
 
 | Param | Type | Description |
 | --- | --- | --- |
+| path | <code>string</code> | The absolute path to use as an cwd with exec |
 | branches | <code>Array.&lt;string&gt;</code> | All repo branches |
 

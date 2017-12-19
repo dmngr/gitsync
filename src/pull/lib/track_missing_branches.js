@@ -13,10 +13,11 @@ const exec = Promise.promisify(require('child_process').exec, {
  */
 /**
  *
+ * @param {string} path The absolute path to use as an cwd with exec
  * @param  {string[]} branches All repo branches
  * @return {string[]} The branches that were added
  */
-module.exports = function(branches) {
+module.exports = function(branches, path) {
   var local_branches = branches.filter(str => str.indexOf('/') === -1);
   var remote_branches = branches.filter(str => /\/production|\/prodv/.test(str));
 
@@ -34,7 +35,9 @@ module.exports = function(branches) {
     // used only for testing
     // return Promise.resolve(branches_to_add);
 
-    return exec(`git branch -t ${local_branch_name} ${remote}`);
+    return exec(`git branch -t ${local_branch_name} ${remote}`, {
+      cwd: path || __dirname
+    });
   }).then(() => Promise.resolve(branches_to_add));
 
 };

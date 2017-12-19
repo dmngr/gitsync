@@ -12,12 +12,16 @@ const exec = Promise.promisify(require('child_process').exec, {
  * @module
  */
 /**
- *
+ * @param {string} path The absolute path to use as an cwd with exec
  * @return {string} Repo status: diverged, fast-forward, up-to-date
  */
-module.exports = function() {
+module.exports = function(path) {
 
-  return exec('git remote update')
+  // console.log('path:', path);
+  // console.log('__dirname:', __dirname);
+  return exec('git remote update', {
+      cwd: path || __dirname
+    })
     .spread((stdout, stderr) => {
       // console.log('stdout:', stdout);
       var match = stdout.match(/diverged|Unpacking|Fetching/);
@@ -29,17 +33,19 @@ module.exports = function() {
           case 'Unpacking':
             return 'fast-forward';
           default:
-            return exec('git status')
+            return exec('git status', {
+                cwd: path || __dirname
+              })
               .spread((stdout, stderr) => {
                 if (stderr) console.log(stderr);
 
                 // console.log(stdout);
-                let match = stdout.match(/diverged|fast\-forwarded|up\-to\-date|ahead/);
+                let match = stdout.match(/diverged|fast\-forward|up\-to\-date|ahead/);
 
                 // console.log('match:', match);
-                return match ? match[0] : 'unsaved changes';
+                return match ? match[0] : 'unsaved-changes';
               });
         }
-      } else return 'no_remote';
+      } else return 'no-remote';
     });
 };

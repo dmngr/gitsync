@@ -13,16 +13,18 @@ const exec = Promise.promisify(require('child_process').exec, {
  */
 /**
  *
- * @param  {string} dir Path to repo
+ * @param {string} path The absolute path to use as an cwd with exec
  * @return {string} Success message
  */
-module.exports = function(dir) {
-  return exec('git pull --all')
+module.exports = function(path) {
+  return exec('git pull --all', {
+      cwd: path || __dirname
+    })
     .spread((stdout, stderr) => {
       if (stderr) console.log(stderr);
       // console.log('stdout:', stdout);
 
       // console.log('dir:', dir);
-      return `Pulled ${dir}`;
+      return `Pulled ${path}`;
     });
 };
