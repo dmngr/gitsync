@@ -11,6 +11,6 @@
  * @return {boolean} Whether path is valid
  */
 module.exports = function(path) {
-  if (!path || path.indexOf(' ') != -1 || typeof path !== 'string') return false;
+  if (!path || ((path.indexOf(' ') != -1 || typeof path !== 'string') && path.indexOf('ignore:'))) return false;
   else return true;
 };

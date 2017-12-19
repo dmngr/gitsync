@@ -17,6 +17,9 @@ const pull = require('./src/pull');
 // console.log('clone:', clone.clone_repo);
 
 module.exports = function() {
+
+  var invalid_desc_repos = [];
+  var repos_to_clone = [];
   // get all local and remote repos
   return Promise.all([
       clone.get_all_repos_names('dmngr', true, 'ioanniswd'),
@@ -34,12 +37,25 @@ module.exports = function() {
         return local_repo.indexOf(remote_repo.name) === -1;
       }) === -1);
 
+      remote_repos.forEach(repo => {
+        console.log('repo.local_path:', repo.local_path);
+        if(!repo.local_path || repo.local_path.indexOf('ignore:') === -1) {
+          console.log('not ignore');
+          if(clone.is_path_valid(repo.local_path)) repos_to_clone.push(repo);
+          else invalid_desc_repos.push(repo);
+        }
+      });
+
+      console.log('invalid_desc_repos:', invalid_desc_repos);
+
       // console.log('remote_repos:', remote_repos);
       // console.log('local_repos:', local_repos);
 
-      console.log('cloning repos');
-      return Promise.map(remote_repos, clone.clone_repo)
-        .then(() => Promise.resolve(local_repos));
+      return local_repos;
+
+      // console.log('cloning repos');
+      // return Promise.map(remote_repos, clone.clone_repo)
+      //   .then(() => Promise.resolve(local_repos));
 
     })
     // pull all local repos that need to update

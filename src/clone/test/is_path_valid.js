@@ -21,3 +21,9 @@ it('returns false for path with spaces', function() {
   var correct_path = is_path_valid(path);
   expect(correct_path).to.equal(false);
 });
+
+it('returns true for path with ignore:', function() {
+  var path = 'ignore:some other repo';
+  var correct_path = is_path_valid(path);
+  expect(correct_path).to.equal(true);
+});
