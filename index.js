@@ -21,6 +21,7 @@ module.exports = function() {
   var invalid_desc_repos = [];
   var repos_to_clone = [];
   // get all local and remote repos
+
   return Promise.all([
       clone.get_all_repos_names('dmngr', true, 'ioanniswd'),
       pull.get_existing_repos()
