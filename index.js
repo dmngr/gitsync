@@ -18,6 +18,8 @@ const pull = require('./src/pull');
 
 module.exports = function() {
 
+  var start = process.hrtime();
+
   var invalid_desc_repos = [];
   var repos_to_clone = [];
   // get all local and remote repos
@@ -62,10 +64,28 @@ module.exports = function() {
     // pull all local repos that need to update
     .then(local_repos => {
       console.log('local_repos:', local_repos.length);
+      var root_dir = process.cwd();
+      console.log('root_dir:', root_dir);
+
+      return Promise.mapSeries(local_repos, path => {
+        process.chdir(path);
+        console.log('process.cwd():', process.cwd());
+        return pull.get_status()
+          .then(status => {
+            console.log('status:', status);
+            process.chdir(root_dir);
+            // console.log('process.cwd():', process.cwd());
+            return;
+          });
+      });
+    })
+    .then(() => {
+      console.log('seconds:', process.hrtime(start)[0]);
       process.exit();
     })
     .catch(err => {
       console.log(err);
+      console.log('seconds:', process.hrtime(start)[0]);
       process.exit(1);
     });
 };

@@ -24,3 +24,7 @@
 // it('for not up to date repo that has diverged', function() {
 //   return expect(get_status()).to.eventually.equal('diverged');
 // });
+//
+// it('for repo that has no remote', function() {
+//   return expect(get_status()).to.eventually.equal('no_remote');
+// });

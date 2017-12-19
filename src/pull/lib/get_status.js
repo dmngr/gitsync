@@ -16,13 +16,14 @@ const exec = Promise.promisify(require('child_process').exec, {
  * @return {string} Repo status: diverged, fast-forward, up-to-date
  */
 module.exports = function() {
-  var status;
 
   return exec('git remote update')
     .spread((stdout, stderr) => {
-      status = stdout.match(/diverged|Unpacking|Fetching/)[0];
-      if (status) {
-        switch (status) {
+      // console.log('stdout:', stdout);
+      var match = stdout.match(/diverged|Unpacking|Fetching/);
+      // console.log('match:', match);
+      if (match) {
+        switch (match[0]) {
           case 'diverged':
             return 'diverged';
           case 'Unpacking':
@@ -33,9 +34,12 @@ module.exports = function() {
                 if (stderr) console.log(stderr);
 
                 // console.log(stdout);
-                return stdout.match(/diverged|fast\-forwarded|up\-to\-date|ahead/)[0];
+                let match = stdout.match(/diverged|fast\-forwarded|up\-to\-date|ahead/);
+
+                // console.log('match:', match);
+                return match ? match[0] : 'unsaved changes';
               });
         }
-      }
+      } else return 'no_remote';
     });
 };
