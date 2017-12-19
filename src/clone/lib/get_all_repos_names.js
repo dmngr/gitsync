@@ -22,58 +22,69 @@ const is_path_valid = require('./is_path_valid');
  * @return {repos}      Mapped to have attributes name, full_name, local_path
  */
 module.exports = function(name, org, user, at) {
+  var repos = [];
 
-  var url = "https://api.github.com/";
+  var first_url = "https://api.github.com/";
 
   // if searching for organization
-  url += org ? 'orgs/' : `users/`;
+  first_url += org ? 'orgs/' : `users/`;
 
-  url += `${name}/repos`;
+  first_url += `${name}/repos`;
 
-  if (at) url += `?access_token=${at}`;
+  if (at) first_url += `?access_token=${at}`;
 
   // console.log('url:', url);
 
-  return request({
-      url: url,
-      headers: {
-        'User-Agent': user
-      }
-    })
-    .spread((res, body) => {
-      // console.log(body);
-      // console.log('res:', res);
-      // console.log('headers: ', res.headers);
-      // console.log('link:', res.headers.link);
-      // console.log('typeof link:', typeof res.headers.link);
+  function get_next(url) {
+    return request({
+        url: url,
+        headers: {
+          'User-Agent': user
+        }
+      })
+      .spread((res, body) => {
+        // console.log(body);
+        // console.log('res:', res);
 
-      var next_link;
+        body = JSON.parse(body);
+        // console.log(body[0]);
+        // console.log('body[0]:', Object.keys(body[0]));
 
-      res.headers.link.split(',').forEach(str => {
-        var arr = str.trim().split(';');
-        if (arr[1].indexOf('next') !== -1) next_link = arr[0].slice(1, -1);
-      });
 
-      console.log('next_link:', next_link);
-
-      body = JSON.parse(body);
-      // console.log(body[0]);
-      // console.log('body[0]:', Object.keys(body[0]));
-
-      let repos = [];
-
-      body.forEach(function(repo) {
-        if (is_path_valid(repo.description)) {
+        body.forEach(function(repo) {
           repos.push({
             name: repo.name,
             full_name: repo.full_name,
-            local_path: repo.description,
+            local_path: repo.description
+          });
+        });
+
+        // console.log('repos: ', repos.length);
+
+        // find next link
+        // console.log('headers: ', res.headers);
+        // console.log('link:', res.headers.link);
+        // console.log('typeof link:', typeof res.headers.link);
+
+        var next_link;
+
+        if (res.headers.link) {
+          res.headers.link.split(',').forEach(str => {
+            var arr = str.trim().split(';');
+            if (arr[1].indexOf('next') !== -1) next_link = arr[0].slice(1, -1);
           });
         }
-      });
 
-      console.log('repos: ', repos.length);
-      return Promise.resolve(repos);
+        // console.log('next_link:', next_link);
+
+        if (!next_link) return repos;
+        else return get_next(next_link);
+      });
+  }
+
+  return get_next(first_url)
+    .then(() => {
+      return repos;
     })
     .catch(err => {
       console.log(err);

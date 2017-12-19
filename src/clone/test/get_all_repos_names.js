@@ -15,39 +15,41 @@ const home = require('os').homedir();
 // NOTE: You may need to increase the timeout, depending on your internet
 // connection speed.
 
+var user;
+var at;
 
-describe('for user', function() {
+before(function(done) {
+  this.timeout(15000);
+  fs.readFile(`${home}/.gitsync.json`, 'utf-8', function(err, data) {
+    if (err) {
+      console.log(err);
+      done(err);
+
+    } else {
+      data = JSON.parse(data);
+      user = data.user;
+      at = data.at;
+      done();
+    }
+  });
+});
+
+it('for org', function() {
+  var org = true;
+  var name = 'dmngr';
+  var num_of_repos = 150;
+
+  this.timeout(15000);
+  // change number of repor
+  return expect(get_all_repos_names(name, org, user, at)).to.eventually.be.an('array').and.have.lengthOf.above(num_of_repos);
+});
+
+it('for user', function() {
   var org = false;
   var name = 'ioanniswd';
+  var num_of_repos = 10;
 
-  var user;
-  var at;
-
-  before(function(done) {
-    this.timeout(15000);
-    fs.readFile(`${home}/.gitsync.json`, 'utf-8', function(err, data) {
-      if(err) {
-        console.log(err);
-        done(err);
-
-      } else {
-        data = JSON.parse(data);
-        user = data.user;
-        at = data.at;
-        done();
-      }
-    });
-  });
-
-  it('returns correct array', function(done) {
-    get_all_repos_names(name, org, user, at)
-    .then(arr => {
-      expect(arr).to.be.an('array').and.have.lengthOf(1);
-      _.each(arr, item => expect(item).to.have.all.keys(['name', 'full_name', 'local_path']));
-      done();
-    })
-    .catch(err => {
-      throw err;
-    });
-  });
+  this.timeout(15000);
+  // change number of repor
+  return expect(get_all_repos_names(name, org, user, at)).to.eventually.be.an('array').and.have.lengthOf.above(num_of_repos);
 });
