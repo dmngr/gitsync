@@ -30,7 +30,7 @@ module.exports = function(repo, at) {
   if (at) url += `${at}@`;
 
   url += `github.com/${repo.full_name}.git`;
-  return exec(`git clone -o upstream "${url}" ${path}`)
+  return exec(`git clone "${url}" ${path}`)
     .spread((stdout, stderr) => {
       if (stderr) console.log(stderr);
       console.log(stdout);

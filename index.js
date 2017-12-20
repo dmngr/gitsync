@@ -58,11 +58,12 @@ module.exports = function() {
       // console.log('remote_repos:', remote_repos);
       // console.log('local_repos:', local_repos);
 
-      return local_repos;
+      // used for testing
+      // return local_repos;
 
-      // console.log('cloning repos');
-      // return Promise.map(remote_repos, clone.clone_repo)
-      //   .then(() => Promise.resolve(local_repos));
+      console.log('cloning repos');
+      return Promise.map(remote_repos, clone.clone_repo)
+        .then(() => Promise.resolve(local_repos));
 
     })
     // pull all local repos that need to update
