@@ -11,6 +11,7 @@ const colors = require('colors/safe');
 const path = require('path');
 const minimist = require('minimist');
 const _ = require('lodash');
+const Spinner = require('cli-spinner').Spinner;
 
 const Clone = require('./src/clone');
 const clone = new Clone();
@@ -93,8 +94,8 @@ module.exports = function() {
       }
     });
 
-    console.log('remote_repos:', repos_to_clone.length);
-    console.log('local_repos:', local_repos.length);
+    // console.log('\nremote_repos:', repos_to_clone.length);
+    // console.log('\nlocal_repos:', local_repos.length);
 
     return {
       remote_repos: repos_to_clone,
@@ -103,6 +104,7 @@ module.exports = function() {
   }
 
   function create_missing_branches(local_repos) {
+
     return Promise.map(local_repos, repo_path => {
       // console.log('repo_path:', repo_path);
       var full_path = path.resolve(repo_path);
@@ -114,12 +116,17 @@ module.exports = function() {
   //
 
   function all() {
+    var spinner = new Spinner('Getting remote and local repos....');
+    spinner.start();
+
     return Promise.all([
         clone.get_all_repos_names('dmngr', true, 'ioanniswd'),
         pull.get_existing_repos()
       ])
       // clone all remotes that do not exist locally
       .then(results => {
+        spinner.stop();
+
         var remote_repos = results[0];
         var local_repos = results[1];
 
@@ -128,7 +135,8 @@ module.exports = function() {
         // used for testing
         // return local_repos;
 
-        console.log('cloning repos');
+        spinner = new Spinner('Cloning missing repos, Pulling, Creating Branches....');
+        spinner.start();
         return Promise.map(filtered_repos.remote_repos, clone.clone_repo)
           .then(() => create_missing_branches(filtered_repos.remote_repos.map(repo => `${repo.local_path}/${repo.name}`)))
           .then(() => Promise.resolve(filtered_repos.local_repos));
@@ -136,13 +144,17 @@ module.exports = function() {
       })
       // pull all local repos that need to update
       .then(pull_local)
-      .then(create_missing_branches);
+      .then(create_missing_branches)
+      .then(() => spinner.stop());
   }
 
   function pull_repos() {
+    var spinner = new Spinner('Finding existing repos and pulling...');
+    spinner.start();
     return pull.get_existing_repos()
       .then(pull_local)
-      .then(create_missing_branches);
+      .then(create_missing_branches)
+      .then(() => spinner.stop());
   }
 
   function clone_repos() {
@@ -159,10 +171,13 @@ module.exports = function() {
 
         // used for testing
         // return local_repos;
+        var spinner = new Spinner('Cloning missing repos and creating branches....');
+        spinner.start();
 
         console.log('cloning repos');
         return Promise.map(filtered_repos.remote_repos, clone.clone_repo)
-          .then(() => create_missing_branches(filtered_repos.remote_repos.map(repo => `${repo.local_path}/${repo.name}`)));
+          .then(() => create_missing_branches(filtered_repos.remote_repos.map(repo => `${repo.local_path}/${repo.name}`)))
+          .then(() => spinner.stop());
       });
   }
 
@@ -181,7 +196,7 @@ module.exports = function() {
   }).then(() => {
 
     if (invalid_desc_repos.length > 0) {
-      console.log(colors.red('Invalid Description Repos:'));
+      console.log(colors.red('\nInvalid Description Repos:'));
       invalid_desc_repos.forEach(repo => {
         console.log(`Repo Name: ${repo.name}`);
         console.log(`Description: ${colors.red(repo.local_path)}`);
