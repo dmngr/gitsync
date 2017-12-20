@@ -32,8 +32,8 @@ module.exports = function(repo, at) {
   url += `github.com/${repo.full_name}.git`;
   return exec(`git clone "${url}" ${path}`)
     .spread((stdout, stderr) => {
-      if (stderr) console.log(stderr);
-      console.log(stdout);
+      // if (stderr) console.log(stderr);
+      // console.log(stdout);
       return Promise.resolve(path);
     });
 };
