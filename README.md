@@ -1,74 +1,123 @@
 # Git Sync
 
-#### Clones all repositories, public or private, of a specified user or organization.
-#### Credentials are required, they are present in a file named .gitsync.json place in the home folder.
+## Clones all repositories, public or private, of a specified user or organization.
+
+## Credentials are required, they are present in a file named .gitsync.json place in the home folder.
 
 ### Installation:
+
 ```
-~$ sudo npm install -g gitsync
+~$ sudo npm install -g @deliverymanager/gitsync
 ```
 
 ### Usage:
 
-#### For user:
+#### For pull:
+
 ```
-~$ gitsync --name <github username>
+~$ gitsync --pull
 ```
 
-#### For organization:
+--------------------------------------------------------------------------------
+
+#### For clone:
+
 ```
-~$ gitsync --org --name <github organization>
+~$ gitsync --clone
 ```
+
+--------------------------------------------------------------------------------
+
+#### For both:
+
+```
+~$ gitsync --all
+```
+
+##### Or:
+
+```
+~$ gitsync -a
+```
+
+--------------------------------------------------------------------------------
+
+#### To (re)initialize credentials:
+
+```
+~$ gitsync --init
+```
+
+--------------------------------------------------------------------------------
+
 ##### The description is used to determine the exact path to which the repository will be cloned.
-##### If the description is empty, or if it contains spaces, the default path is used, `./<repository name>`.
+
+##### If the description is not a valid path, a warning appears.
 
 ### Examples:
+
 Repository description: `path/to/folder` -> Will clone the repository in `./path/to/folder/<repository name>`
 
-Repository description: `Some description` -> Will clone the repository in `./<repository name>`
-
-Empty repository description -> Will clone the repository in `./<repository name>`
-
+Repository description: `Some description` -> Will show a warning and __not__ clone
 
 ### Authentication:
-##### The following file, .gitsync.json, must be placed in the home folder and is required for authentication with the GitHub API:
 
-##### If you only want to clone public repositories:
-```
-{
-  "user": <github username>
-}
-```
-##### If you want to clone private repositories as well:
+#### The following file, .gitsync.json, must be placed in the home folder and is required for authentication with the GitHub API:
+
+#### For only public repositories:
+
 ```
 {
   "user": <github username>,
-  "at": <github API access token>
+  "user_agent": <github user_agent>,
+  "sync_account": <account from which to sync>,
+  "org": <true/false> // whether the sync_account is an organization
 }
 ```
-##### To run the tests as well, the file must look like this:
+
+#### For private repositories as well:
+
 ```
 {
   "user": <github username>,
+  "user_agent": <github user_agent>,
+  "sync_account": <account from which to sync>,
+  "org": <true/false> // whether the sync_account is an organization,
   "at": <github API access token>
+}
+```
+
+#### To run the tests as well, the file must look like this:
+
+```
+{
+  "user": <github username>,
+  "at": <github API access token>,
   "test_repo_1": {
     "name": <repo name>,
-    "full_name": <repo full name>
+    "full_name": <repo full name>,
     "local_path": <local path to which the repo will be cloned>
   },
   "test_repo_2": {
     "name": <repo name>,
-    "full_name": <repo full name>
+    "full_name": <repo full name>,
     "local_path": <local path to which the repo will be cloned>
-  }
+  },
+  "user_agent": <github user_agent>,
+  "sync_account": <account from which to sync>,
+  "org": <true/false> // whether the sync_account is an organization
 }
 ```
-##### You can place the file yourself or you could run `~$ gitsync --cred` which will prompt for user name and Github API access token.
+
+#### You can place the file yourself or you could run `~$ gitsync --init` which will prompt for user name and Github API access token.
+
 ```
-~$ gitsync --cred
+~$ gitsync --init
 ```
-##### If you try to use the script without the `.gitsync.json` file present in the home folder, you will be prompted to initialize it, and execution will continue after the file is created.
-##### *Note*: You could omit the access token. The script will still work but *only* for public repositories.
+
+#### If you try to use the script without the `.gitsync.json` file present in the home folder, you will be prompted to initialize it, and execution will continue after the file is created.
+
+#### _Note_: You could omit the access token. The script will still work but _only_ for public repositories.
 
 # API Reference
 ---
@@ -80,12 +129,14 @@ Initializes/updates git credentials
 
 <a name="exp_module_src/clone/lib/init_cred--module.exports"></a>
 
-### module.exports() ⇒ <code>Promise</code> ⏏
-Reads file with credentials, prompts for creation if not found and for update if found.
-Creates/Updates credentials.
-
+### module.exports([cred]) ⇒ <code>Promise</code> ⏏
 **Kind**: Exported function  
 **Returns**: <code>Promise</code> - Resolves to the the output of fs.writeFile or to message: 'Credentials not updated'  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [cred] | <code>object</code> | <code>{}</code> | Credentials to keep Reads file with credentials, prompts for creation if not found and for update if found. Creates/Updates credentials. |
+
 
 ### get_all_repos_names
 Gets all user's or org's repos names
