@@ -27,7 +27,7 @@ module.exports = function() {
   process.env.UV_THREADPOOL_SIZE = 10;
 
   var args = minimist(process.argv.slice(2), {
-    boolean: ['all', 'a', 'pull', 'clone', 'org']
+    boolean: ['all', 'a', 'pull', 'clone', 'init']
   });
 
   var start = process.hrtime();
@@ -54,22 +54,40 @@ module.exports = function() {
         })
         .then(org => {
           cred.org = org.toLowerCase().indexOf('y') !== -1;
+          return prompt('Default Root Folder: ');
+        })
+        .then(default_root_path => {
+          default_root_path = path.resolve(default_root_path);
+
+          cred.default_root_path = default_root_path;
           let data = JSON.stringify(cred, null, '\t');
           return fs.writeFileAsync(`${homedir}/.gitsync.json`, data);
         })
-        .then(() => cred);
+        .then(() => {
+          if (cred.default_root_path) process.chdir(cred.default_root_path);
+          return cred;
+        });
     }
 
-    if (args.init) return init().then(clone.init_cred);
-    else if (args.user && args.acount) {
-      return {
-        user_agent: args.user,
-        sync_account: args.account
-      };
+    if (args.init) {
+      return fs.readFileAsync(`${homedir}/.gitsync.json`, 'utf-8')
+        .then(data => init(JSON.parse(data)).then(clone.init_cred))
+        .catch(err => {
+          if (err.code != 'ENOENT') throw err;
+          else return init().then(clone.init_cred);
+        });
+
     } else {
       return fs.readFileAsync(`${homedir}/.gitsync.json`, 'utf-8')
         .then(data => {
           data = JSON.parse(data);
+          if (args.account) data.sync_account = args.account;
+          if (args.org) data.org = args.org;
+          if (args.user) data.user_agent = args.user;
+          if (args.cwd) data.default_root_path = args.cwd;
+
+          if (data.default_root_path) process.chdir(data.default_root_path);
+
           if (data.user_agent && data.sync_account) return data;
           else return init(data);
 
@@ -170,7 +188,7 @@ module.exports = function() {
         spinner.start();
 
         return Promise.all([
-            clone.get_all_repos_names(cred.sync_account, cred.org, cred.user_agent),
+            clone.get_all_repos_names(cred.sync_account, cred.org, cred.user_agent, cred.at),
             pull.get_existing_repos()
           ])
           // clone all remotes that do not exist locally
@@ -200,9 +218,13 @@ module.exports = function() {
   }
 
   function pull_repos() {
-    var spinner = new Spinner('Finding existing repos and pulling...');
-    spinner.start();
-    return pull.get_existing_repos()
+    var spinner;
+    return get_sync_info()
+      .then(() => {
+        spinner = new Spinner('Finding existing repos and pulling...');
+        spinner.start();
+        return pull.get_existing_repos();
+      })
       .then(pull_local)
       .then(create_missing_branches)
       .then(() => spinner.stop());
@@ -212,7 +234,7 @@ module.exports = function() {
     return get_sync_info()
       .then(cred => {
         return Promise.all([
-          clone.get_all_repos_names(cred.sync_account, cred.org, cred.user_agent),
+          clone.get_all_repos_names(cred.sync_account, cred.org, cred.user_agent, cred.at),
           pull.get_existing_repos()
         ]);
       })
