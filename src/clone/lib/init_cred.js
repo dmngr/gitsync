@@ -12,24 +12,29 @@ const prompt = require('prompt-promise');
  */
 /**
  *
+ * @param {object} [cred={}] Credentials to keep
+ *
  * Reads file with credentials, prompts for creation if not found and for update if found.
  * Creates/Updates credentials.
  * @return {Promise} Resolves to the the output of fs.writeFile or to message: 'Credentials not updated'
  */
-module.exports = function() {
+module.exports = function(cred) {
 
-  var cred = {};
+  if (!cred) cred = {};
 
   function init() {
+    console.log('Creating Credentials File..');
+
     return prompt('Github username: ')
       .then(username => {
         cred.user = username;
-        return prompt('Github API access token: ');
+        return prompt.password('Github API access token: ');
       })
       .then(at => {
         cred.at = at;
         let data = JSON.stringify(cred, null, '\t');
-        return fs.writeFileAsync(`${home}/.gitsync.json`, data);
+        return fs.writeFileAsync(`${home}/.gitsync.json`, data)
+          .then(() => cred);
       });
   }
 
@@ -37,20 +42,17 @@ module.exports = function() {
   return fs.readFileAsync(`${home}/.gitsync.json`, 'utf-8')
     .then(data => {
       data = JSON.parse(data);
-      console.log('Credentials file already exists:');
+      // console.log('Credentials file already exists:');
       console.log(data);
 
-      return prompt.confirm('Update credentials file? (yes)');
+      return prompt.confirm('Update credentials file? (yes): ');
     })
     .then(update => {
       console.log('update:', update);
-      return update ? init : Promise.resolve('Credentials not updated');
+      return update ? init() : Promise.resolve('Credentials not updated');
     })
     .catch(err => {
       if (err.code != 'ENOENT') throw err;
-      else {
-        console.log('Creating Credentials File..');
-        return init();
-      }
+      else return init();
     });
 };

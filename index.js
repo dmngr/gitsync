@@ -6,12 +6,14 @@ var Promise = require('bluebird');
 
 const exec = Promise.promisify(require('child_process').exec);
 const find = Promise.promisifyAll(require('find'));
+const fs = Promise.promisifyAll(require('fs'));
 const homedir = require('os').homedir();
 const colors = require('colors/safe');
 const path = require('path');
 const minimist = require('minimist');
 const _ = require('lodash');
 const Spinner = require('cli-spinner').Spinner;
+const prompt = require('prompt-promise');
 
 const Clone = require('./src/clone');
 const clone = new Clone();
@@ -25,7 +27,7 @@ module.exports = function() {
   process.env.UV_THREADPOOL_SIZE = 10;
 
   var args = minimist(process.argv.slice(2), {
-    boolean: ['all', 'pull', 'clone']
+    boolean: ['all', 'a', 'pull', 'clone', 'org']
   });
 
   var start = process.hrtime();
@@ -34,6 +36,51 @@ module.exports = function() {
   var err_repos = [];
 
   // util
+  function get_sync_info() {
+
+    function init(cred) {
+      console.log('Creating Configuration File..');
+
+      if (!cred) cred = {};
+
+      return prompt('User agent: ')
+        .then(user_agent => {
+          cred.user_agent = user_agent;
+          return prompt('Sync account: ');
+        })
+        .then(sync_account => {
+          cred.sync_account = sync_account;
+          return prompt('Is account an organization? (no): ');
+        })
+        .then(org => {
+          cred.org = org.toLowerCase().indexOf('y') !== -1;
+          let data = JSON.stringify(cred, null, '\t');
+          return fs.writeFileAsync(`${homedir}/.gitsync.json`, data);
+        })
+        .then(() => cred);
+    }
+
+    if (args.init) return init().then(clone.init_cred);
+    else if (args.user && args.acount) {
+      return {
+        user_agent: args.user,
+        sync_account: args.account
+      };
+    } else {
+      return fs.readFileAsync(`${homedir}/.gitsync.json`, 'utf-8')
+        .then(data => {
+          data = JSON.parse(data);
+          if (data.user_agent && data.sync_account) return data;
+          else return init(data);
+
+        })
+        .catch(err => {
+          if (err.code != 'ENOENT') throw err;
+          else return init().then(clone.init_cred);
+        });
+    }
+  }
+
   function pull_local(local_repos) {
     console.log('local_repos:', local_repos.length);
     // var root_dir = process.cwd();
@@ -116,36 +163,40 @@ module.exports = function() {
   //
 
   function all() {
-    var spinner = new Spinner('Getting remote and local repos....');
-    spinner.start();
 
-    return Promise.all([
-        clone.get_all_repos_names('dmngr', true, 'ioanniswd'),
-        pull.get_existing_repos()
-      ])
-      // clone all remotes that do not exist locally
-      .then(results => {
-        spinner.stop();
-
-        var remote_repos = results[0];
-        var local_repos = results[1];
-
-        var filtered_repos = filter_repos(remote_repos, local_repos);
-
-        // used for testing
-        // return local_repos;
-
-        spinner = new Spinner('Cloning missing repos, Pulling, Creating Branches....');
+    return get_sync_info()
+      .then(cred => {
+        var spinner = new Spinner('Getting remote and local repos....');
         spinner.start();
-        return Promise.map(filtered_repos.remote_repos, clone.clone_repo)
-          .then(() => create_missing_branches(filtered_repos.remote_repos.map(repo => `${repo.local_path}/${repo.name}`)))
-          .then(() => Promise.resolve(filtered_repos.local_repos));
 
-      })
-      // pull all local repos that need to update
-      .then(pull_local)
-      .then(create_missing_branches)
-      .then(() => spinner.stop());
+        return Promise.all([
+            clone.get_all_repos_names(cred.sync_account, cred.org, cred.user_agent),
+            pull.get_existing_repos()
+          ])
+          // clone all remotes that do not exist locally
+          .then(results => {
+            spinner.stop();
+
+            var remote_repos = results[0];
+            var local_repos = results[1];
+
+            var filtered_repos = filter_repos(remote_repos, local_repos);
+
+            // used for testing
+            // return local_repos;
+
+            spinner = new Spinner('Cloning missing repos, Pulling, Creating Branches....');
+            spinner.start();
+            return Promise.map(filtered_repos.remote_repos, clone.clone_repo)
+              .then(() => create_missing_branches(filtered_repos.remote_repos.map(repo => `${repo.local_path}/${repo.name}`)))
+              .then(() => Promise.resolve(filtered_repos.local_repos));
+
+          })
+          // pull all local repos that need to update
+          .then(pull_local)
+          .then(create_missing_branches)
+          .then(() => spinner.stop());
+      });
   }
 
   function pull_repos() {
@@ -158,10 +209,13 @@ module.exports = function() {
   }
 
   function clone_repos() {
-    return Promise.all([
-        clone.get_all_repos_names('dmngr', true, 'ioanniswd'),
-        pull.get_existing_repos()
-      ])
+    return get_sync_info()
+      .then(cred => {
+        return Promise.all([
+          clone.get_all_repos_names(cred.sync_account, cred.org, cred.user_agent),
+          pull.get_existing_repos()
+        ]);
+      })
       // clone all remotes that do not exist locally
       .then(results => {
         var remote_repos = results[0];
@@ -184,7 +238,9 @@ module.exports = function() {
 
   Promise.try(function() {
     switch (true) {
-      case args.all:
+      case args.init:
+        return get_sync_info();
+      case (args.all || args.a):
         return all();
       case args.pull:
         return pull_repos();
