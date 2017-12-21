@@ -34,6 +34,10 @@ module.exports = function() {
 
   var invalid_desc_repos = [];
   var err_repos = [];
+  var diverged = [];
+  var ahead = [];
+  var no_remote = [];
+  var unsaved_changes = [];
 
   // util
   function get_sync_info() {
@@ -110,26 +114,30 @@ module.exports = function() {
 
         return pull.get_status(full_path)
           .then(status => {
+            // console.log('status:', status);
             switch (status) {
               case 'fast-forward':
                 return pull.pull_all(full_path)
                   .catch(err => {
-                    console.log(colors.red(`Repo ${full_path} could not pull\n`));
                     err_repos.push(repo_path);
                     return;
                   });
               case 'diverged':
-                console.log(colors.red(`Repo ${full_path} has diverged\n`));
+                diverged.push(full_path);
                 return;
               case 'ahead':
-                console.log(colors.rainbow(`Repo ${full_path} is ahead of remote\n`));
+                ahead.push(full_path);
                 return;
               case 'no-remote':
-                console.log(colors.yellow(`Repo ${full_path} has no remote\n`));
+                no_remote.push(full_path);
                 return;
-              case 'unsaved-changes':
-                console.log(colors.red(`Repo ${full_path} has unsaved-changes\n`));
+              case 'Untracked':
+                unsaved_changes.push(full_path);
                 return;
+              case 'Changes to be committed':
+                unsaved_changes.push(full_path);
+                return;
+
               default:
                 // console.log(colors.green(`Repo ${full_path} is up-to-date\n`));
                 return;
@@ -282,15 +290,34 @@ module.exports = function() {
     }
 
     if (err_repos.length > 0) {
-      console.log(colors.red('Repos that returned error:'));
+      console.log(colors.red('\nRepos that returned error:'));
       console.log(err_repos);
     }
 
-    console.log('Success');
+    if (diverged.length > 0) {
+      console.log(colors.red('\nRepos that have diverged:'));
+      console.log(diverged);
+    }
+
+    if (ahead.length > 0) {
+      console.log(colors.green('\nRepos that are ahead of remote:'));
+      console.log(ahead);
+    }
+    if (no_remote.length > 0) {
+      console.log(colors.yellow('\nRepos that have no remote:'));
+      console.log(no_remote);
+    }
+
+    if (unsaved_changes.length > 0) {
+      console.log(colors.rainbow('\nRepos that have unsaved changes:'));
+      console.log(unsaved_changes);
+    }
+
+    console.log(colors.green('Success'));
     console.log('seconds:', process.hrtime(start)[0]);
     process.exit();
   }).catch(err => {
-    console.log(err);
+    console.log(colors.red(err));
     console.log('seconds:', process.hrtime(start)[0]);
     process.exit(1);
   });

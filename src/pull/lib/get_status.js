@@ -40,10 +40,10 @@ module.exports = function(path) {
                 if (stderr) console.log(stderr);
 
                 // console.log(stdout);
-                let match = stdout.match(/diverged|fast\-forward|up\-to\-date|ahead/);
+                let match = stdout.match(/diverged|fast\-forward|Changes to be committed|Untracked|directory clean|ahead/);
 
                 // console.log('match:', match);
-                return match ? match[0] : 'unsaved-changes';
+                return match ? match[0] : 'Untracked';
               });
         }
       } else return 'no-remote';
