@@ -1,6 +1,6 @@
 {
   "name": "@deliverymanager/gitsync",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Synchronize multiple git repos recursively",
   "main": "index.js",
   "scripts": {
