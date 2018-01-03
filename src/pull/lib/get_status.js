@@ -40,7 +40,7 @@ module.exports = function(path) {
                 if (stderr) console.log(stderr);
 
                 // console.log(stdout);
-                let match = stdout.match(/diverged|fast\-forward|Changes to be committed|Untracked|directory clean|ahead/);
+                let match = stdout.match(/diverged|fast\-forward|Changes to be committed|Untracked|working (directory|tree) clean|ahead/);
 
                 // console.log('match:', match);
                 return match ? match[0] : 'Untracked';
