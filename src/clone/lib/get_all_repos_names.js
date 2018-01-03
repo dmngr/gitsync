@@ -52,11 +52,13 @@ module.exports = function(name, org, user, at) {
 
 
         body.forEach(function(repo) {
-          repos.push({
-            name: repo.name,
-            full_name: repo.full_name,
-            local_path: repo.description
-          });
+          if (repo.description && repo.description.indexOf('ignore:') == -1) {
+            repos.push({
+              name: repo.name,
+              full_name: repo.full_name,
+              local_path: repo.description
+            });
+          }
         });
 
         // console.log('repos: ', repos.length);
