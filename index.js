@@ -38,6 +38,8 @@ module.exports = function() {
   var ahead = [];
   var no_remote = [];
   var unsaved_changes = [];
+  var repos_pulled = [];
+  var repos_cloned = [];
 
   // util
   function get_sync_info() {
@@ -118,6 +120,10 @@ module.exports = function() {
             switch (status) {
               case 'fast-forward':
                 return pull.pull_all(full_path)
+                  .then(() => {
+                    repos_pulled.push(full_path);
+                    return;
+                  })
                   .catch(err => {
                     err_repos.push(repo_path);
                     return;
@@ -208,6 +214,8 @@ module.exports = function() {
 
             var filtered_repos = filter_repos(remote_repos, local_repos);
 
+            repos_cloned = filtered_repos.remote_repos;
+
             // used for testing
             // return local_repos;
 
@@ -252,6 +260,8 @@ module.exports = function() {
         var local_repos = results[1];
 
         var filtered_repos = filter_repos(remote_repos, local_repos);
+
+        repos_cloned = filtered_repos.remote_repos;
 
         // used for testing
         // return local_repos;
@@ -313,7 +323,10 @@ module.exports = function() {
       console.log(unsaved_changes);
     }
 
-    console.log(colors.green('Success'));
+    if (!args.clone && !args.init) console.log('\nrepos pulled:', repos_pulled);
+    if (!args.pull && !args.init) console.log('\nrepos cloned:', repos_cloned);
+
+    console.log(colors.green('\nSuccess'));
     console.log('seconds:', process.hrtime(start)[0]);
     process.exit();
   }).catch(err => {
