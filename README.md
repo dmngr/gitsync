@@ -50,6 +50,14 @@
 
 --------------------------------------------------------------------------------
 
+#### To checkout to stable branches (production/prodv4_6):
+
+```
+~$ gitsync --checkout
+```
+
+--------------------------------------------------------------------------------
+
 ##### The description is used to determine the exact path to which the repository will be cloned.
 
 ##### If the description is not a valid path, a warning appears.

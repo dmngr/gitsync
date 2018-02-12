@@ -4,7 +4,9 @@
 
 var Promise = require('bluebird');
 
-const exec = Promise.promisify(require('child_process').exec);
+const exec = Promise.promisify(require('child_process').exec, {
+  multiArgs: true
+});
 const find = Promise.promisifyAll(require('find'));
 const fs = Promise.promisifyAll(require('fs'));
 const homedir = require('os').homedir();
@@ -27,7 +29,7 @@ module.exports = function() {
   process.env.UV_THREADPOOL_SIZE = 10;
 
   var args = minimist(process.argv.slice(2), {
-    boolean: ['all', 'a', 'pull', 'clone', 'init']
+    boolean: ['all', 'a', 'pull', 'clone', 'init', 'checkout']
   });
 
   var start = process.hrtime();
@@ -189,7 +191,22 @@ module.exports = function() {
       var full_path = path.resolve(repo_path);
 
       return pull.get_all_branches(full_path)
-        .then(branches => pull.track_missing_branches(branches, full_path));
+        .then(branches => pull.track_missing_branches(branches, full_path))
+        .then(branches_added => checkout(branches_added, full_path));
+    });
+  }
+
+  function checkout(branches, full_path) {
+    // console.log('branches: ', branches);
+    var stable_branch;
+    if (branches.indexOf('prodv4_6') !== -1) stable_branch = 'prodv4_6';
+    else if (branches.indexOf('production') !== -1) stable_branch = 'production';
+
+    // console.log('stable_branch:', stable_branch);
+
+    if (!stable_branch) return Promise.resolve();
+    else return exec(`git checkout ${stable_branch}`, {
+      cwd: full_path
     });
   }
   //
@@ -275,64 +292,85 @@ module.exports = function() {
       });
   }
 
+  function checkout_stable() {
+    var spinner;
+    spinner = new Spinner('Checking out to stable branches...');
+    spinner.start();
+    return get_sync_info()
+      .then(pull.get_existing_repos)
+      .then(repos => {
+        return Promise.map(repos, repo_path => {
+          var full_path = path.resolve(repo_path);
+          // console.log('full_path:', full_path);
+
+          return pull.get_all_branches(full_path)
+            .then(branches => checkout(branches, full_path));
+        }, {
+          concurrency: 20
+        });
+      })
+      .then(() => spinner.stop());
+  }
 
   Promise.try(function() {
-    switch (true) {
-      case args.init:
-        return get_sync_info();
-      case (args.all || args.a):
-        return all();
-      case args.pull:
-        return pull_repos();
-      case args.clone:
-        return clone_repos();
-      default:
-        return Promise.reject('Arguments required: --pull to pull repos, --clone to clone repos, --all to both pull and clone');
-    }
-  }).then(() => {
+      switch (true) {
+        case args.init:
+          return get_sync_info();
+        case (args.all || args.a):
+          return all();
+        case args.pull:
+          return pull_repos();
+        case args.clone:
+          return clone_repos();
+        case args.checkout:
+          return checkout_stable();
+        default:
+          return Promise.reject('Arguments required: --pull to pull repos, --clone to clone repos, --all to both pull and clone');
+      }
+    })
+    .then(() => {
+      if (invalid_desc_repos.length > 0) {
+        console.log(colors.red('\nInvalid Description Repos:'));
+        invalid_desc_repos.forEach(repo => {
+          console.log(`Repo Name: ${repo.name}`);
+          console.log(`Description: ${colors.red(repo.local_path)}`);
+        });
+      }
 
-    if (invalid_desc_repos.length > 0) {
-      console.log(colors.red('\nInvalid Description Repos:'));
-      invalid_desc_repos.forEach(repo => {
-        console.log(`Repo Name: ${repo.name}`);
-        console.log(`Description: ${colors.red(repo.local_path)}`);
-      });
-    }
+      if (err_repos.length > 0) {
+        console.log(colors.red('\nRepos that returned error:'));
+        console.log(err_repos);
+      }
 
-    if (err_repos.length > 0) {
-      console.log(colors.red('\nRepos that returned error:'));
-      console.log(err_repos);
-    }
+      if (diverged.length > 0) {
+        console.log(colors.red('\nRepos that have diverged:'));
+        console.log(diverged);
+      }
 
-    if (diverged.length > 0) {
-      console.log(colors.red('\nRepos that have diverged:'));
-      console.log(diverged);
-    }
+      if (ahead.length > 0) {
+        console.log(colors.green('\nRepos that are ahead of remote:'));
+        console.log(ahead);
+      }
+      if (no_remote.length > 0) {
+        console.log(colors.yellow('\nRepos that have no remote:'));
+        console.log(no_remote);
+      }
 
-    if (ahead.length > 0) {
-      console.log(colors.green('\nRepos that are ahead of remote:'));
-      console.log(ahead);
-    }
-    if (no_remote.length > 0) {
-      console.log(colors.yellow('\nRepos that have no remote:'));
-      console.log(no_remote);
-    }
+      if (unsaved_changes.length > 0) {
+        console.log(colors.rainbow('\nRepos that have unsaved changes:'));
+        console.log(unsaved_changes);
+      }
 
-    if (unsaved_changes.length > 0) {
-      console.log(colors.rainbow('\nRepos that have unsaved changes:'));
-      console.log(unsaved_changes);
-    }
+      if (!args.clone && !args.init) console.log('\nrepos pulled:', repos_pulled);
+      if (!args.pull && !args.init) console.log('\nrepos cloned:', repos_cloned);
 
-    if (!args.clone && !args.init) console.log('\nrepos pulled:', repos_pulled);
-    if (!args.pull && !args.init) console.log('\nrepos cloned:', repos_cloned);
-
-    console.log(colors.green('\nSuccess'));
-    console.log('seconds:', process.hrtime(start)[0]);
-    process.exit();
-  }).catch(err => {
-    console.log(colors.red(err));
-    console.log('seconds:', process.hrtime(start)[0]);
-    process.exit(1);
-  });
+      console.log(colors.green('\nSuccess'));
+      console.log('seconds:', process.hrtime(start)[0]);
+      process.exit();
+    }).catch(err => {
+      console.log(colors.red(err));
+      console.log('seconds:', process.hrtime(start)[0]);
+      process.exit(1);
+    });
 
 };
