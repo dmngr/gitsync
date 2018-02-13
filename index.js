@@ -5,7 +5,7 @@
 var Promise = require('bluebird');
 
 const exec = Promise.promisify(require('child_process').exec, {
-  multiArgs: true
+  multiArgs: false
 });
 const find = Promise.promisifyAll(require('find'));
 const fs = Promise.promisifyAll(require('fs'));
@@ -29,7 +29,7 @@ module.exports = function() {
   process.env.UV_THREADPOOL_SIZE = 10;
 
   var args = minimist(process.argv.slice(2), {
-    boolean: ['all', 'a', 'pull', 'clone', 'init', 'checkout']
+    boolean: ['all', 'a', 'pull', 'clone', 'init', 'checkout', 'verbose']
   });
 
   var start = process.hrtime();
@@ -39,6 +39,7 @@ module.exports = function() {
   var diverged = [];
   var ahead = [];
   var no_remote = [];
+  var unable_to_checkout = [];
   var unsaved_changes = [];
   var repos_pulled = [];
   var repos_cloned = [];
@@ -206,8 +207,13 @@ module.exports = function() {
 
     if (!stable_branch) return Promise.resolve();
     else return exec(`git checkout ${stable_branch}`, {
-      cwd: full_path
-    });
+        cwd: full_path
+      })
+      .catch(err => {
+        if (args.verbose) console.log(`Path: ${full_path}, err:${err}`);
+        unable_to_checkout.push(full_path);
+        return Promise.resolve();
+      });
   }
   //
 
@@ -329,6 +335,7 @@ module.exports = function() {
       }
     })
     .then(() => {
+      console.log('\n');
       if (invalid_desc_repos.length > 0) {
         console.log(colors.red('\nInvalid Description Repos:'));
         invalid_desc_repos.forEach(repo => {
@@ -347,6 +354,11 @@ module.exports = function() {
         console.log(diverged);
       }
 
+      if (unable_to_checkout.length > 0) {
+        console.log(colors.red('\nRepos that were unable to checkout to stable branch:'));
+        console.log(unable_to_checkout);
+      }
+
       if (ahead.length > 0) {
         console.log(colors.green('\nRepos that are ahead of remote:'));
         console.log(ahead);
@@ -361,8 +373,8 @@ module.exports = function() {
         console.log(unsaved_changes);
       }
 
-      if (!args.clone && !args.init) console.log('\nrepos pulled:', repos_pulled);
-      if (!args.pull && !args.init) console.log('\nrepos cloned:', repos_cloned);
+      if (!args.clone && !args.init && !args.checkout) console.log('\nrepos pulled:', repos_pulled);
+      if (!args.pull && !args.init && !args.checkout) console.log('\nrepos cloned:', repos_cloned);
 
       console.log(colors.green('\nSuccess'));
       console.log('seconds:', process.hrtime(start)[0]);
