@@ -5,7 +5,7 @@
 var Promise = require('bluebird');
 
 const exec = Promise.promisify(require('child_process').exec, {
-  multiArgs: false
+  multiArgs: true
 });
 const find = Promise.promisifyAll(require('find'));
 const fs = Promise.promisifyAll(require('fs'));
@@ -41,8 +41,10 @@ module.exports = function() {
   var no_remote = [];
   var unable_to_checkout = [];
   var unsaved_changes = [];
+
   var repos_pulled = [];
   var repos_cloned = [];
+  var repos_checked_out = [];
 
   // util
   function get_sync_info() {
@@ -208,6 +210,12 @@ module.exports = function() {
     if (!stable_branch) return Promise.resolve();
     else return exec(`git checkout ${stable_branch}`, {
         cwd: full_path
+      })
+      // stderr not really err
+      .spread((stderr, stdout) => {
+        // console.log('stdout:', stdout);
+        if (stdout.indexOf('Already on') === -1) repos_checked_out.push(full_path);
+        return Promise.resolve();
       })
       .catch(err => {
         if (args.verbose) console.log(`Path: ${full_path}, err:${err}`);
@@ -375,6 +383,7 @@ module.exports = function() {
 
       if (!args.clone && !args.init && !args.checkout) console.log('\nrepos pulled:', repos_pulled);
       if (!args.pull && !args.init && !args.checkout) console.log('\nrepos cloned:', repos_cloned);
+      if (args.checkout) console.log('\nrepos checked out: ', repos_checked_out);
 
       console.log(colors.green('\nSuccess'));
       console.log('seconds:', process.hrtime(start)[0]);
