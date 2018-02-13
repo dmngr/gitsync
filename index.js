@@ -339,7 +339,7 @@ module.exports = function() {
         case args.checkout:
           return checkout_stable();
         default:
-          return Promise.reject('Arguments required: --pull to pull repos, --clone to clone repos, --all to both pull and clone');
+          return Promise.reject('Arguments required: --pull to pull repos, --clone to clone repos, --all to both pull and clone, --checkout to checkout to stable branches');
       }
     })
     .then(() => {
