@@ -1,6 +1,6 @@
 "use strict";
 
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
 const exec = Promise.promisify(require('child_process').exec, {
   multiArgs: true

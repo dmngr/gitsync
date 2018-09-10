@@ -2,7 +2,7 @@
 
 "use strict";
 
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
 const find = require('find');
 const exec = Promise.promisify(require('child_process').exec, {
@@ -17,7 +17,7 @@ const exec = Promise.promisify(require('child_process').exec, {
  *
  * @return {string[]} The repository folder paths under cwd
  */
-return new Promise(function(resolve, reject) {
+new Promise(function(resolve) {
     find.file(/^((?!(node_modules|\.git|\.idea|\.vscode|\.dropbox|\.zip|test\/)).)*\.js$/, './', files => {
       // console.log('files:', files);
 

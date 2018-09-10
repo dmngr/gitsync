@@ -1,8 +1,8 @@
 "use strict";
 
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
-var chai = require('chai');
+const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -19,9 +19,9 @@ const exec = Promise.promisify(require('child_process').exec, {
 // NOTE: You may need to increase the timeout, depending on your internet
 // connection speed.
 
-  var repo_1;
-  var repo_2;
-  var at;
+  let repo_1;
+  let repo_2;
+  let at;
 
   before(function(done) {
     this.timeout(15000);
@@ -53,14 +53,14 @@ const exec = Promise.promisify(require('child_process').exec, {
   after(function(done) {
     this.timeout(15000);
     exec('rm -R ./tmp')
-      .spread((stdout, stderr) => {
+      .spread(() => {
         // console.log('stdout:', stdout);
         // console.log('stderr:', stderr);
         // console.log('dirname:', __dirname);
         // console.log('process.cwd():', process.cwd());
         return exec(`rm -R ${process.cwd()}/test/path`);
       })
-      .spread((stdout, stderr) => {
+      .spread(() => {
         // console.log('stdout:', stdout);
         // console.log('stderr:', stderr);
 

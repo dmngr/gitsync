@@ -1,11 +1,9 @@
 "use strict";
 
-var chai = require('chai');
+const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-
-const _ = require('lodash');
 
 const index = require('../index');
 const get_all_repos_names = new index().get_all_repos_names;
@@ -15,11 +13,12 @@ const home = require('os').homedir();
 // NOTE: You may need to increase the timeout, depending on your internet
 // connection speed.
 
-var user;
-var at;
+let user;
+let at;
+
 
 before(function(done) {
-  this.timeout(15000);
+  this.timeout(120000);
   fs.readFile(`${home}/.gitsync.json`, 'utf-8', function(err, data) {
     if (err) {
       console.log(err);
@@ -35,21 +34,23 @@ before(function(done) {
 });
 
 it('for org', function() {
-  var org = true;
-  var name = 'dmngr';
-  var num_of_repos = 150;
+  this.timeout(120000);
 
-  this.timeout(15000);
+  const org = true;
+  const name = 'dmngr';
+  const num_of_repos = 150;
+
   // change number of repor
   return expect(get_all_repos_names(name, org, user, at)).to.eventually.be.an('array').and.have.lengthOf.above(num_of_repos);
 });
 
 it('for user', function() {
-  var org = false;
-  var name = 'ioanniswd';
-  var num_of_repos = 10;
+  this.timeout(120000);
+  
+  const org = false;
+  const name = 'ioanniswd';
+  const num_of_repos = 10;
 
-  this.timeout(15000);
   // change number of repor
   return expect(get_all_repos_names(name, org, user, at)).to.eventually.be.an('array').and.have.lengthOf.above(num_of_repos);
 });

@@ -1,12 +1,10 @@
 "use strict";
 
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
 const request = Promise.promisify(require('request'), {
   multiArgs: true
 });
-
-const is_path_valid = require('./is_path_valid');
 
 
 /**
@@ -22,9 +20,9 @@ const is_path_valid = require('./is_path_valid');
  * @return {repos}      Mapped to have attributes name, full_name, local_path
  */
 module.exports = function(name, org, user, at) {
-  var repos = [];
+  const repos = [];
 
-  var first_url = "https://api.github.com/";
+  let first_url = "https://api.github.com/";
 
   // if searching for organization
   first_url += org ? 'orgs/' : `users/`;
@@ -35,6 +33,13 @@ module.exports = function(name, org, user, at) {
 
   // console.log('url:', url);
 
+
+  /**
+   * get_next
+   *
+   * @param  {type} url
+   * @return {type}
+   */
   function get_next(url) {
     return request({
         url: url,
@@ -68,11 +73,11 @@ module.exports = function(name, org, user, at) {
         // console.log('link:', res.headers.link);
         // console.log('typeof link:', typeof res.headers.link);
 
-        var next_link;
+        let next_link;
 
         if (res.headers.link) {
           res.headers.link.split(',').forEach(str => {
-            var arr = str.trim().split(';');
+            const arr = str.trim().split(';');
             if (arr[1].indexOf('next') !== -1) next_link = arr[0].slice(1, -1);
           });
         }

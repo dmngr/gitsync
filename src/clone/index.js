@@ -1,6 +1,6 @@
 "use strict";
 
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
 const fs = Promise.promisifyAll(require('fs'));
 const home = require('os').homedir();
@@ -12,9 +12,14 @@ const init_cred = require('./lib/init_cred');
 
 module.exports = function() {
 
-  var at;
+  let at;
 
   // used to check for authentication token before operations that require it
+  /**
+   * check_at
+   *
+   * @return {type}
+   */
   function check_at() {
     if (!at) {
       return fs.readFileAsync(`${home}/.gitsync.json`, 'utf-8')
@@ -25,10 +30,10 @@ module.exports = function() {
           } else return init_cred();
 
         }).
-        catch(err => {
-          if (err.code != 'ENOENT') throw err;
-          else return init_cred();
-        });
+      catch(err => {
+        if (err.code != 'ENOENT') throw err;
+        else return init_cred();
+      });
     } else return Promise.resolve();
   }
 

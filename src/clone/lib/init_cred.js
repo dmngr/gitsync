@@ -1,6 +1,6 @@
 "use strict";
 
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
 const fs = Promise.promisifyAll(require('fs'));
 const home = require('os').homedir();
@@ -22,6 +22,12 @@ module.exports = function(cred) {
 
   if (!cred) cred = {};
 
+
+  /**
+   * init
+   *
+   * @return {type}
+   */
   function init() {
     console.log('Creating Credentials File..');
 
@@ -32,7 +38,7 @@ module.exports = function(cred) {
       })
       .then(at => {
         cred.at = at;
-        let data = JSON.stringify(cred, null, '\t');
+        const data = JSON.stringify(cred, null, '\t');
         return fs.writeFileAsync(`${home}/.gitsync.json`, data)
           .then(() => cred);
       });

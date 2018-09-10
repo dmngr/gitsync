@@ -1,6 +1,6 @@
 "use strict";
 
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
 const exec = Promise.promisify(require('child_process').exec, {
   multiArgs: true
@@ -22,9 +22,9 @@ module.exports = function(path) {
   return exec('git remote update', {
       cwd: path || __dirname
     })
-    .spread((stdout, stderr) => {
+    .spread((stdout) => {
       // console.log('stdout:', stdout);
-      var match = stdout.match(/diverged|Unpacking|Fetching/);
+      const match = stdout.match(/diverged|Unpacking|Fetching/);
       // console.log('match:', match);
       if (match) {
         switch (match[0]) {
@@ -40,7 +40,7 @@ module.exports = function(path) {
                 if (stderr) console.log(stderr);
 
                 // console.log(stdout);
-                let match = stdout.match(/diverged|fast\-forward|Changes to be committed|Untracked|working (directory|tree) clean|ahead/);
+                const match = stdout.match(/diverged|fast-forward|Changes to be committed|Untracked|working (directory|tree) clean|ahead/);
 
                 // console.log('match:', match);
                 return match ? match[0] : 'Untracked';

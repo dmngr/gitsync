@@ -2,12 +2,11 @@
 
 "use strict";
 
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
 const exec = Promise.promisify(require('child_process').exec, {
   multiArgs: true
 });
-const find = Promise.promisifyAll(require('find'));
 const fs = Promise.promisifyAll(require('fs'));
 const homedir = require('os').homedir();
 const colors = require('colors/safe');
@@ -28,27 +27,38 @@ module.exports = function() {
 
   process.env.UV_THREADPOOL_SIZE = 10;
 
-  var args = minimist(process.argv.slice(2), {
+  const args = minimist(process.argv.slice(2), {
     boolean: ['all', 'a', 'pull', 'clone', 'init', 'checkout', 'verbose']
   });
 
-  var start = process.hrtime();
+  const start = process.hrtime();
 
-  var invalid_desc_repos = [];
-  var err_repos = [];
-  var diverged = [];
-  var ahead = [];
-  var no_remote = [];
-  var unable_to_checkout = [];
-  var unsaved_changes = [];
+  const invalid_desc_repos = [];
+  const err_repos = [];
+  const diverged = [];
+  const ahead = [];
+  const no_remote = [];
+  const unable_to_checkout = [];
+  const unsaved_changes = [];
 
-  var repos_pulled = [];
-  var repos_cloned = [];
-  var repos_checked_out = [];
+  const repos_pulled = [];
+  let repos_cloned = [];
+  const repos_checked_out = [];
 
   // util
+  /**
+   * get_sync_info
+   *
+   * @return {type}
+   */
   function get_sync_info() {
 
+    /**
+     * init - description
+     *
+     * @param  {type} cred
+     * @return {type}
+     */
     function init(cred) {
       console.log('Creating Configuration File..');
 
@@ -71,7 +81,7 @@ module.exports = function() {
           default_root_path = path.resolve(default_root_path);
 
           cred.default_root_path = default_root_path;
-          let data = JSON.stringify(cred, null, '\t');
+          const data = JSON.stringify(cred, null, '\t');
           return fs.writeFileAsync(`${homedir}/.gitsync.json`, data);
         })
         .then(() => {
@@ -110,14 +120,21 @@ module.exports = function() {
     }
   }
 
+
+  /**
+   * pull_local
+   *
+   * @param  {type} local_repos
+   * @return {type}
+   */
   function pull_local(local_repos) {
     console.log('local_repos:', local_repos.length);
-    // var root_dir = process.cwd();
+    // const root_dir = process.cwd();
     // console.log('root_dir:', root_dir);
 
     return Promise.map(local_repos, repo_path => {
         // console.log('repo_path:', repo_path);
-        var full_path = path.resolve(repo_path);
+        const full_path = path.resolve(repo_path);
 
         return pull.get_status(full_path)
           .then(status => {
@@ -129,7 +146,7 @@ module.exports = function() {
                     repos_pulled.push(full_path);
                     return;
                   })
-                  .catch(err => {
+                  .catch(() => {
                     err_repos.push(repo_path);
                     return;
                   });
@@ -160,8 +177,16 @@ module.exports = function() {
       .then(() => local_repos);
   }
 
+
+  /**
+   * filter_repos
+   *
+   * @param  {type} remote_repos
+   * @param  {type} local_repos
+   * @return {type}
+   */
   function filter_repos(remote_repos, local_repos) {
-    var repos_to_clone = [];
+    const repos_to_clone = [];
     // remove local repos from remote repos
 
     remote_repos = _.filter(remote_repos, remote_repo => local_repos.findIndex(local_repo => local_repo.slice(local_repo.lastIndexOf('/') !== -1 ? (local_repo.lastIndexOf('/') + 1) : 0) === remote_repo.name) === -1);
@@ -187,21 +212,16 @@ module.exports = function() {
     };
   }
 
-  function create_missing_branches(local_repos) {
-
-    return Promise.map(local_repos, repo_path => {
-      // console.log('repo_path:', repo_path);
-      var full_path = path.resolve(repo_path);
-
-      return pull.get_all_branches(full_path)
-        .then(branches => pull.track_missing_branches(branches, full_path))
-        .then(branches_added => checkout(branches_added, full_path));
-    });
-  }
-
+  /**
+   * checkout - description
+   *
+   * @param  {type} branches  description
+   * @param  {type} full_path description
+   * @return {type}           description
+   */
   function checkout(branches, full_path) {
     // console.log('branches: ', branches);
-    var stable_branch;
+    let stable_branch;
     if (branches.indexOf('prodv4_6') !== -1) stable_branch = 'prodv4_6';
     else if (branches.indexOf('production') !== -1) stable_branch = 'production';
 
@@ -225,11 +245,34 @@ module.exports = function() {
   }
   //
 
+  /**
+   * create_missing_branches
+   *
+   * @param  {type} local_repos
+   * @return {type}
+   */
+  function create_missing_branches(local_repos) {
+
+    return Promise.map(local_repos, repo_path => {
+      // console.log('repo_path:', repo_path);
+      const full_path = path.resolve(repo_path);
+
+      return pull.get_all_branches(full_path)
+        .then(branches => pull.track_missing_branches(branches, full_path))
+        .then(branches_added => checkout(branches_added, full_path));
+    });
+  }
+
+  /**
+   * all
+   *
+   * @return {type}
+   */
   function all() {
 
     return get_sync_info()
       .then(cred => {
-        var spinner = new Spinner('Getting remote and local repos....');
+        let spinner = new Spinner('Getting remote and local repos....');
         spinner.start();
 
         return Promise.all([
@@ -240,10 +283,10 @@ module.exports = function() {
           .then(results => {
             spinner.stop();
 
-            var remote_repos = results[0];
-            var local_repos = results[1];
+            const remote_repos = results[0];
+            const local_repos = results[1];
 
-            var filtered_repos = filter_repos(remote_repos, local_repos);
+            const filtered_repos = filter_repos(remote_repos, local_repos);
 
             repos_cloned = filtered_repos.remote_repos;
 
@@ -264,8 +307,14 @@ module.exports = function() {
       });
   }
 
+
+  /**
+   * pull_repos - description
+   *
+   * @return {type}  description
+   */
   function pull_repos() {
-    var spinner;
+    let spinner;
     return get_sync_info()
       .then(() => {
         spinner = new Spinner('Finding existing repos and pulling...');
@@ -277,6 +326,12 @@ module.exports = function() {
       .then(() => spinner.stop());
   }
 
+
+  /**
+   * clone_repos - description
+   *
+   * @return {type}  description
+   */
   function clone_repos() {
     return get_sync_info()
       .then(cred => {
@@ -287,16 +342,16 @@ module.exports = function() {
       })
       // clone all remotes that do not exist locally
       .then(results => {
-        var remote_repos = results[0];
-        var local_repos = results[1];
+        const remote_repos = results[0];
+        const local_repos = results[1];
 
-        var filtered_repos = filter_repos(remote_repos, local_repos);
+        const filtered_repos = filter_repos(remote_repos, local_repos);
 
         repos_cloned = filtered_repos.remote_repos;
 
         // used for testing
         // return local_repos;
-        var spinner = new Spinner('Cloning missing repos and creating branches....');
+        const spinner = new Spinner('Cloning missing repos and creating branches....');
         spinner.start();
 
         console.log('cloning repos');
@@ -306,15 +361,20 @@ module.exports = function() {
       });
   }
 
+
+  /**
+   * checkout_stable - description
+   *
+   * @return {type}  description
+   */
   function checkout_stable() {
-    var spinner;
-    spinner = new Spinner('Checking out to stable branches...');
+    const spinner = new Spinner('Checking out to stable branches...');
     spinner.start();
     return get_sync_info()
       .then(pull.get_existing_repos)
       .then(repos => {
         return Promise.map(repos, repo_path => {
-          var full_path = path.resolve(repo_path);
+          const full_path = path.resolve(repo_path);
           // console.log('full_path:', full_path);
 
           return pull.get_all_branches(full_path)

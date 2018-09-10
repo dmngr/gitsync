@@ -1,6 +1,6 @@
 "use strict";
 
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
 const exec = Promise.promisify(require('child_process').exec, {
   multiArgs: true
@@ -23,7 +23,7 @@ module.exports = function(path) {
       if (stderr) console.log(stderr);
       // console.log(stdout);
 
-      var arr = stdout.split('\n').map(str => str.replace(/[^A-Za-z0-9_\/]/g, '')).map(str => str.replace(/remotes\//g, '')).filter(str => str.length > 0);
+      const arr = stdout.split('\n').map(str => str.replace(/[^A-Za-z0-9_/]/g, '')).map(str => str.replace(/remotes\//g, '')).filter(str => str.length > 0);
       // console.log(arr);
 
       return arr;

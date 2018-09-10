@@ -1,6 +1,6 @@
 "use strict";
 
-var Promise = require('bluebird');
+const Promise = require('bluebird');
 
 const exec = Promise.promisify(require('child_process').exec, {
   multiArgs: true
@@ -18,19 +18,19 @@ const exec = Promise.promisify(require('child_process').exec, {
  * @return {string[]} The branches that were added
  */
 module.exports = function(branches, path) {
-  var local_branches = branches.filter(str => str.indexOf('/') === -1);
-  var remote_branches = branches.filter(str => /\/production|\/prodv/.test(str));
+  const local_branches = branches.filter(str => str.indexOf('/') === -1);
+  const remote_branches = branches.filter(str => /\/production|\/prodv/.test(str));
 
   // console.log('local_branches:', local_branches);
   // console.log('remote_branches:', remote_branches);
 
-  var branches_to_add = remote_branches
+  const branches_to_add = remote_branches
     .filter(remote => local_branches.indexOf(remote.substring(remote.indexOf('/') + 1)) === -1);
 
   // console.log('branches_to_add:', branches_to_add);
 
   return Promise.map(branches_to_add, remote => {
-    var local_branch_name = remote.substring(remote.indexOf('/') + 1);
+    const local_branch_name = remote.substring(remote.indexOf('/') + 1);
 
     // used only for testing
     // return Promise.resolve(branches_to_add);

@@ -1,5 +1,13 @@
 "use strict";
 
+
+/**
+ * import_test
+ *
+ * @param  {type} name
+ * @param  {type} path
+ * @return {type}      
+ */
 function import_test(name, path) {
   describe(name, function() {
     require(path);
