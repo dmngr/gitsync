@@ -260,6 +260,8 @@ module.exports = function() {
       return pull.get_all_branches(full_path)
         .then(branches => pull.track_missing_branches(branches, full_path))
         .then(branches_added => checkout(branches_added, full_path));
+    }, {
+      concurrency: 20
     });
   }
 
@@ -295,7 +297,9 @@ module.exports = function() {
 
             spinner = new Spinner('Cloning missing repos, Pulling, Creating Branches....');
             spinner.start();
-            return Promise.map(filtered_repos.remote_repos, clone.clone_repo)
+            return Promise.map(filtered_repos.remote_repos, clone.clone_repo, {
+                concurrency: 20
+              })
               .then(() => create_missing_branches(filtered_repos.remote_repos.map(repo => `${repo.local_path}/${repo.name}`)))
               .then(() => Promise.resolve(filtered_repos.local_repos));
 
@@ -355,7 +359,9 @@ module.exports = function() {
         spinner.start();
 
         console.log('cloning repos');
-        return Promise.map(filtered_repos.remote_repos, clone.clone_repo)
+        return Promise.map(filtered_repos.remote_repos, clone.clone_repo, {
+            concurrency: 20
+          })
           .then(() => create_missing_branches(filtered_repos.remote_repos.map(repo => `${repo.local_path}/${repo.name}`)))
           .then(() => spinner.stop());
       });
