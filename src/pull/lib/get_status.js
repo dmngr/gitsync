@@ -47,5 +47,9 @@ module.exports = function(path) {
               });
         }
       } else return 'no-remote';
+    })
+    .catch(err => {
+      console.log('Path with err:', path);
+      return Promise.reject(err);
     });
 };
