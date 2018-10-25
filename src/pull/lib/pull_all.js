@@ -21,10 +21,17 @@ module.exports = function(path) {
       cwd: path || __dirname
     })
     .spread((stdout, stderr) => {
-      if (stderr) console.log(stderr);
+      if (stderr) {
+        console.log('path:', path);
+        console.log(stderr);
+      }
       // console.log('stdout:', stdout);
 
       // console.log('dir:', dir);
       return `Pulled ${path}`;
+    })
+    .catch(err => {
+      console.log('Path with err:', path);
+      return Promise.reject(err);
     });
 };
