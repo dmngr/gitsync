@@ -15,11 +15,12 @@ const exec = Promise.promisify(require('child_process').exec, {
  * @param {string} path The absolute path to use as an cwd with exec
  * @return {string} Repo status: diverged, fast-forward, up-to-date
  */
-module.exports = function(path) {
+module.exports = function (path) {
 
   // console.log('path:', path);
   // console.log('__dirname:', __dirname);
   return exec('git remote update', {
+      maxBuffer: 1024 * 1024 * 1024,
       cwd: path || __dirname
     })
     .spread((stdout) => {
@@ -34,6 +35,7 @@ module.exports = function(path) {
             return 'fast-forward';
           default:
             return exec('git status', {
+                maxBuffer: 1024 * 1024 * 1024,
                 cwd: path || __dirname
               })
               .spread((stdout, stderr) => {
