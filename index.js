@@ -23,7 +23,7 @@ const pull = require('./src/pull');
 
 // console.log('clone:', clone.clone_repo);
 
-module.exports = function() {
+module.exports = function () {
 
   process.env.UV_THREADPOOL_SIZE = 10;
 
@@ -229,6 +229,7 @@ module.exports = function() {
 
     if (!stable_branch) return Promise.resolve();
     else return exec(`git checkout ${stable_branch}`, {
+        maxBuffer: 1024 * 1024 * 1024,
         cwd: full_path
       })
       // stderr not really err
@@ -392,7 +393,7 @@ module.exports = function() {
       .then(() => spinner.stop());
   }
 
-  Promise.try(function() {
+  Promise.try(function () {
       switch (true) {
         case args.init:
           return get_sync_info();
