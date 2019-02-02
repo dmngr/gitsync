@@ -66,7 +66,7 @@ module.exports = function(name, org, user, at) {
           }
         });
 
-        // console.log('repos: ', repos.length);
+        console.log('repos: ', repos.length);
 
         // find next link
         // console.log('headers: ', res.headers);
