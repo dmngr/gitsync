@@ -15,7 +15,7 @@ const exec = Promise.promisify(require('child_process').exec, {
  * @param {string} path The absolute path to use as an cwd with exec
  * @return {string[]}  The branch names
  */
-module.exports = function(path) {
+module.exports = function (path) {
   return exec('git branch -a', {
       cwd: path || __dirname
     })

@@ -21,7 +21,7 @@ const is_path_valid = require('./is_path_valid');
  * @param  {string} at   Github authentication token
  * @return {Promise} Resolves to the path under which the repo was cloned
  */
-module.exports = function(repo, at) {
+module.exports = function (repo, at) {
   let path = "";
   let url = 'https://';
 
@@ -30,9 +30,9 @@ module.exports = function(repo, at) {
 
   url += `github.com/${repo.full_name}.git`;
   return exec(`git clone "${url}" ${path}`)
-    .spread(() => {
-      // if (stderr) console.log(stderr);
-      // console.log(stdout);
+    .spread((stderr, stdout) => {
+      if (stderr) console.log(stderr);
+      console.log(stdout);
       return Promise.resolve(path);
     });
 };

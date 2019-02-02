@@ -10,7 +10,7 @@ const get_all_repos_names = require('./lib/get_all_repos_names');
 const is_path_valid = require('./lib/is_path_valid');
 const init_cred = require('./lib/init_cred');
 
-module.exports = function() {
+module.exports = function () {
 
   let at;
 

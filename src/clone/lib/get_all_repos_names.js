@@ -19,7 +19,7 @@ const request = Promise.promisify(require('request'), {
  * @param  {string} at   Github authentication token
  * @return {repos}      Mapped to have attributes name, full_name, local_path
  */
-module.exports = function(name, org, user, at) {
+module.exports = function (name, org, user, at) {
   const repos = [];
 
   let first_url = "https://api.github.com/";
@@ -52,11 +52,11 @@ module.exports = function(name, org, user, at) {
         // console.log('res:', res);
 
         body = JSON.parse(body);
-        // console.log(body[0]);
-        // console.log('body[0]:', Object.keys(body[0]));
+        //console.log(body[0]);
+        //console.log('body[0]:', Object.keys(body[0]));
 
 
-        body.forEach(function(repo) {
+        body.forEach(function (repo) {
           if (repo.description && repo.description.indexOf('ignore:') == -1) {
             repos.push({
               name: repo.name,
@@ -66,7 +66,7 @@ module.exports = function(name, org, user, at) {
           }
         });
 
-        console.log('repos: ', repos.length);
+        //console.log('repos: ', repos.length);
 
         // find next link
         // console.log('headers: ', res.headers);
@@ -82,7 +82,7 @@ module.exports = function(name, org, user, at) {
           });
         }
 
-        console.log('next_link:', next_link);
+        //console.log('next_link:', next_link);
 
         if (!next_link) return repos;
         else return get_next(next_link);

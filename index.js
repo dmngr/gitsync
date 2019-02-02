@@ -21,7 +21,7 @@ const clone = new Clone();
 
 const pull = require('./src/pull');
 
-// console.log('clone:', clone.clone_repo);
+//console.log('clone:', clone.clone_repo);
 
 module.exports = function () {
 
@@ -188,8 +188,18 @@ module.exports = function () {
   function filter_repos(remote_repos, local_repos) {
     const repos_to_clone = [];
     // remove local repos from remote repos
+    remote_repos = _.filter(remote_repos, remote_repo => {
+      const foundIndex = local_repos.findIndex(local_repo => {
+        if (local_repo.slice(local_repo.lastIndexOf('/') !== -1 ? (local_repo.lastIndexOf('/') + 1) : 0) === remote_repo.name) {
+          return true;
+        }
+      });
+      if (foundIndex === -1) {
+        console.log("\nremote_repo not found:", remote_repo);
+        return true;
+      }
 
-    remote_repos = _.filter(remote_repos, remote_repo => local_repos.findIndex(local_repo => local_repo.slice(local_repo.lastIndexOf('/') !== -1 ? (local_repo.lastIndexOf('/') + 1) : 0) === remote_repo.name) === -1);
+    });
 
     remote_repos.forEach(repo => {
       // console.log('repo.local_path:', repo.local_path);
@@ -258,7 +268,7 @@ module.exports = function () {
       // console.log('repo_path:', repo_path);
       const full_path = path.resolve(repo_path);
 
-      console.log("full_path", full_path);
+      //console.log("full_path", full_path);
       return pull.get_all_branches(full_path)
         .then(branches => pull.track_missing_branches(branches, full_path))
         .then(branches_added => checkout(branches_added, full_path));
@@ -289,7 +299,6 @@ module.exports = function () {
 
             const remote_repos = results[0];
             const local_repos = results[1];
-
             const filtered_repos = filter_repos(remote_repos, local_repos);
 
             repos_cloned = filtered_repos.remote_repos;
@@ -382,7 +391,7 @@ module.exports = function () {
       .then(pull.get_existing_repos)
       .then(repos => {
         return Promise.map(repos, repo_path => {
-          const full_path = path.resolve(repo_path);
+          //const full_path = path.resolve(repo_path);
           // console.log('full_path:', full_path);
 
           return pull.get_all_branches(full_path)
@@ -394,6 +403,7 @@ module.exports = function () {
       .then(() => spinner.stop());
   }
 
+  //Starting the functions
   Promise.try(function () {
       switch (true) {
         case args.init:

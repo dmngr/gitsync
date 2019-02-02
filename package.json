@@ -1,6 +1,6 @@
 {
   "name": "@deliverymanager/gitsync",
-  "version": "1.2.6",
+  "version": "1.2.24",
   "description": "Synchronize multiple git repos recursively",
   "main": "index.js",
   "scripts": {
@@ -34,8 +34,8 @@
     "request": "^2.83.0"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
-    "chai-as-promised": "^7.1.1",
-    "mocha": "^5.2.0"
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
+    "mocha": "5.2.0"
   }
 }
