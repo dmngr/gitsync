@@ -258,6 +258,7 @@ module.exports = function () {
       // console.log('repo_path:', repo_path);
       const full_path = path.resolve(repo_path);
 
+      console.log("full_path", full_path);
       return pull.get_all_branches(full_path)
         .then(branches => pull.track_missing_branches(branches, full_path))
         .then(branches_added => checkout(branches_added, full_path));

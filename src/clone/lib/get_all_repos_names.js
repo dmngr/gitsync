@@ -82,7 +82,7 @@ module.exports = function(name, org, user, at) {
           });
         }
 
-        // console.log('next_link:', next_link);
+        console.log('next_link:', next_link);
 
         if (!next_link) return repos;
         else return get_next(next_link);
