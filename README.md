@@ -50,7 +50,7 @@
 
 --------------------------------------------------------------------------------
 
-#### To checkout to stable branches (production/mov5):
+#### To checkout to stable branches (production/prod):
 
 ```
 ~$ gitsync --checkout

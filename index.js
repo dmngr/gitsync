@@ -232,7 +232,7 @@ module.exports = function () {
   function checkout(branches, full_path) {
     // console.log('branches: ', branches);
     let stable_branch;
-    if (branches.indexOf('mov5') !== -1) stable_branch = 'mov5';
+    if (branches.indexOf('prod') !== -1) stable_branch = 'prod';
     else if (branches.indexOf('production') !== -1) stable_branch = 'production';
 
     // console.log('stable_branch:', stable_branch);
