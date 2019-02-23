@@ -48,8 +48,8 @@ module.exports = function (name, org, user, at) {
         }
       })
       .spread((res, body) => {
-        // console.log(body);
-        // console.log('res:', res);
+        //console.log(body);
+        //console.log('res:', res);
 
         body = JSON.parse(body);
         //console.log(body[0]);
